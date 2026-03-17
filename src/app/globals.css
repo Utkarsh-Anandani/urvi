@@ -116,6 +116,27 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+.text-main {
+ @apply text-[#166534] 
+}
+
+.text-sub {
+  @apply text-[#B8960C]
+}
+
+.bg-sub {
+  @apply bg-[#B8960C]
+}
+
+button {
+  @apply cursor-pointer
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  @apply bg-neutral-50
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
