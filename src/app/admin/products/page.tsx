@@ -11,7 +11,14 @@ import {
 } from "../page";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Star } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -21,8 +28,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Field, FieldGroup } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import FileUpload from "@/components/global/file-upload";
+import { useUpload } from "@/hooks/useUpload";
+import { toast } from "sonner";
+import { CreateProduct } from "@/actions/product";
+import { useMutationData } from "@/hooks/useMutationData";
+import { CreateProductBody } from "@/types/product.types";
 
 type ProductStatus = "Active" | "Out of Stock" | "Low Stock";
+type ImageData = {
+  url: string | null;
+  position: number;
+};
 
 const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
   const map = {
@@ -47,6 +76,98 @@ const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
 
 const Products = () => {
   const [search, setSearch] = useState("");
+  const [addingProduct, setAddingProduct] = useState(false);
+  const { upload, isUploading } = useUpload();
+  const [imageData, setImageData] = useState<ImageData[]>([]);
+
+  const { mutate, isPending } = useMutationData(
+    ["create-product"],
+    CreateProduct,
+    "products",
+    (data) => {
+      if (data.status === 201) {
+        toast("Product created successfully");
+      } else {
+        toast(data.message || "Something went wrong");
+      }
+    },
+  );
+
+  const handleFilesUpload = async (files: File[]) => {
+    try {
+      if (!files?.length) return;
+
+      const filesData = (await upload(files, "products")) ?? [];
+
+      // Separate success & failed uploads
+      const failedFiles = filesData.filter(
+        (file) => !file?.success || !file?.fileURL,
+      );
+
+      if (failedFiles.length > 0) {
+        toast(`${failedFiles.length} file(s) failed to upload`);
+        return;
+      }
+
+      const data = filesData.map((file, index) => ({
+        url: file.fileURL,
+        position: index,
+      }));
+
+      setImageData(data);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast("Something went wrong during file upload");
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const form = e.currentTarget;
+      const formData = new FormData(form);
+
+      const name = formData.get("name") as string;
+      const description = formData.get("description") as string;
+      const price = Number(formData.get("price"));
+      const discountPrice = formData.get("discount")
+        ? Number(formData.get("discount"))
+        : null;
+      const stock = Number(formData.get("stock"));
+
+      const categoryId = null;
+
+      if (!name || !price || stock < 0 || price < 1) {
+        toast("Please fill all required fields correctly");
+        return;
+      }
+
+      if (!imageData.length) {
+        toast("Please upload at least one image");
+        return;
+      }
+
+      const payload: CreateProductBody = {
+        name,
+        description,
+        price,
+        discountPrice,
+        stock,
+        categoryId,
+        images: imageData,
+        slug: null,
+      };
+
+      mutate(payload);
+      form.reset();
+      setImageData([]);
+      setAddingProduct(false);
+    } catch (error) {
+      console.error(error);
+      toast("Something went wrong");
+    }
+  };
+
   const filtered = PRODUCTS.filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -59,6 +180,7 @@ const Products = () => {
         subtitle={`${PRODUCTS.length} products in your catalogue`}
         action={
           <Button
+            onClick={() => setAddingProduct(true)}
             className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
             style={{
               background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
@@ -70,6 +192,124 @@ const Products = () => {
           </Button>
         }
       />
+      {addingProduct && (
+        <Card
+          className="border-0 shadow-sm mb-2"
+          style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
+        >
+          <CardHeader>
+            <CardTitle>Add Product</CardTitle>
+            <CardDescription>
+              Add a new product to list it on the website
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleFormSubmit}>
+            <CardContent className="flex flex-col-reverse gap-y-4 md:flex-row md:gap-x-4 py-2">
+              <FieldGroup>
+                <Field>
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Organic Rice - 1kg"
+                  />
+                </Field>
+                <Field>
+                  <Label htmlFor="category">Category</Label>
+                  <Select name="ctegory">
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Categories</SelectLabel>
+                        <SelectItem value="ghee">Ghee</SelectItem>
+                        <SelectItem value="millets">Millets</SelectItem>
+                        <SelectItem value="flour">Flour</SelectItem>
+                        <SelectItem value="spices">Spices</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    rows={5}
+                    id="description"
+                    name="description"
+                    placeholder="Organic rice, from the fields of Madhya Pradesh..."
+                  />
+                </Field>
+                <Field>
+                  <Label htmlFor="price">Price (in rupees)</Label>
+                  <Input
+                    type="number"
+                    id="price"
+                    name="price"
+                    placeholder="500"
+                  />
+                </Field>
+                <Field>
+                  <Label htmlFor="discount">Discount Price (in rupees)</Label>
+                  <Input
+                    type="number"
+                    id="discount"
+                    name="discount"
+                    placeholder="400"
+                  />
+                </Field>
+                <Field>
+                  <Label htmlFor="stock">Stock (in units)</Label>
+                  <Input
+                    type="number"
+                    id="stock"
+                    name="stock"
+                    placeholder="20"
+                  />
+                </Field>
+              </FieldGroup>
+              <Field>
+                <Label htmlFor="images">Images</Label>
+                <FileUpload
+                  id="images"
+                  accept="image/*"
+                  disabled={isUploading}
+                  multiple
+                  onChange={(files: File[]) => handleFilesUpload(files)}
+                />
+              </Field>
+            </CardContent>
+            <CardFooter className="flex flex-row items-center justify-end gap-x-2">
+              <Button
+                type="submit"
+                className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
+                style={{
+                  background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                  border: "none",
+                  fontFamily: "'Lato', sans-serif",
+                }}
+                variant={"default"}
+              >
+                Confirm
+              </Button>
+              <Button
+                className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
+                style={{
+                  fontFamily: "'Lato', sans-serif",
+                }}
+                variant={"destructive"}
+                onClick={() => {
+                  setAddingProduct(false);
+                  setImageData([]);
+                }}
+              >
+                Cancel
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      )}
       <Card
         className="border-0 shadow-sm"
         style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}

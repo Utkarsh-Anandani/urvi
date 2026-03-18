@@ -53,7 +53,7 @@ const AdminSidebar = ({
                 boxShadow: `0 3px 12px ${GREEN}40`,
               }}
             >
-              <Leaf size={16} color={GOLD} strokeWidth={2} />
+              <Leaf size={16} color={"#fff"} strokeWidth={2} />
             </div>
             <div>
               <p
@@ -64,7 +64,7 @@ const AdminSidebar = ({
                   letterSpacing: "0.14em",
                 }}
               >
-                Verdant
+                Urvi
               </p>
               <p
                 className="text-xs tracking-widest uppercase"
@@ -169,7 +169,7 @@ const AdminSidebar = ({
                 className="text-xs text-gray-400 truncate"
                 style={{ fontFamily: "'Lato', sans-serif" }}
               >
-                admin@verdant.com
+                admin@urvi.life
               </p>
             </div>
             <button className="text-gray-300 hover:text-red-400 transition-colors">

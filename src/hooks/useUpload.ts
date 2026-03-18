@@ -8,11 +8,11 @@ export function useUpload() {
   async function upload(files: File[], folder: string) {
     try {
       setUploading(true);
-
       const urls = await uploadFiles(files, folder);
-
       return urls;
     } catch (error) {
+      console.error("Uploading Images: ", error);
+    } finally {
       setUploading(false);
     }
   }
