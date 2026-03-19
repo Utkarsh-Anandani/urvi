@@ -1,13 +1,5 @@
 import { z } from "zod";
 
-// slug generator
-const generateSlug = (name: string) =>
-  name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
-
 export const CreateProductSchema = z
   .object({
     name: z
@@ -33,8 +25,6 @@ export const CreateProductSchema = z
 
     categoryId: z.string().uuid().optional().nullable(),
 
-    slug: z.string().optional().nullable(),
-
     images: z
       .array(
         z.object({
@@ -48,7 +38,3 @@ export const CreateProductSchema = z
     message: "Discount price must be less than actual price",
     path: ["discountPrice"],
   })
-  .transform((data) => ({
-    ...data,
-    slug: generateSlug(data.name) || null,
-  }));

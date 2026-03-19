@@ -23,7 +23,7 @@ export async function getPresignedUrl(
       expiresIn: 60,
     });
 
-    const fileURL = `${process.env.R2_PUBLIC_URL!}/${key}`;
+    const fileURL = `${process.env.R2_PUBLIC_FETCH_URL!}/${key}`;
 
     return {
       success: true,

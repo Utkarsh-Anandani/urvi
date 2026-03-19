@@ -7,10 +7,9 @@ import {
   GREEN,
   GREEN_LIGHT,
   PageHeader,
-  PRODUCTS,
 } from "../page";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Star } from "lucide-react";
+import { Loader, Plus, Search, Star } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -43,11 +42,15 @@ import { Textarea } from "@/components/ui/textarea";
 import FileUpload from "@/components/global/file-upload";
 import { useUpload } from "@/hooks/useUpload";
 import { toast } from "sonner";
-import { CreateProduct } from "@/actions/product";
+import { CreateProduct, GetAdminProducts } from "@/actions/product";
 import { useMutationData } from "@/hooks/useMutationData";
-import { CreateProductBody } from "@/types/product.types";
+import {
+  CreateProductBody,
+  GetAdminProductsResponse,
+} from "@/types/product.types";
+import { useQueryData } from "@/hooks/useQueryData";
 
-type ProductStatus = "Active" | "Out of Stock" | "Low Stock";
+type ProductStatus = "Active" | "Out of Stock" | "Low Stock" | "Inactive";
 type ImageData = {
   url: string | null;
   position: number;
@@ -58,6 +61,7 @@ const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
     Active: { bg: "#dcfce7", color: "#166534" },
     "Out of Stock": { bg: "#fee2e2", color: "#991b1b" },
     "Low Stock": { bg: "#fef9c3", color: "#854d0e" },
+    Inactive: { bg: "#fef9c3", color: "#854d0e" },
   };
   const cfg = map[status] || { bg: "#f3f4f6", color: "#374151" };
   return (
@@ -83,15 +87,13 @@ const Products = () => {
   const { mutate, isPending } = useMutationData(
     ["create-product"],
     CreateProduct,
-    "products",
-    (data) => {
-      if (data.status === 201) {
-        toast("Product created successfully");
-      } else {
-        toast(data.message || "Something went wrong");
-      }
-    },
+    "admin-products"
   );
+
+  const { data, isFetched } = useQueryData(["admin-products"], () =>
+    GetAdminProducts(),
+  );
+  const { status, data: products } = data as GetAdminProductsResponse;
 
   const handleFilesUpload = async (files: File[]) => {
     try {
@@ -155,29 +157,24 @@ const Products = () => {
         stock,
         categoryId,
         images: imageData,
-        slug: null,
       };
 
       mutate(payload);
-      form.reset();
-      setImageData([]);
-      setAddingProduct(false);
+      if (!isPending) {
+        form.reset();
+        setImageData([]);
+        setAddingProduct(false);
+      }
     } catch (error) {
       console.error(error);
       toast("Something went wrong");
     }
   };
-
-  const filtered = PRODUCTS.filter(
-    (p) =>
-      p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.category.toLowerCase().includes(search.toLowerCase()),
-  );
   return (
     <main className="flex-1 overflow-y-auto p-5 lg:p-7">
       <PageHeader
         title="Products"
-        subtitle={`${PRODUCTS.length} products in your catalogue`}
+        subtitle={`${products.length} products in your catalogue`}
         action={
           <Button
             onClick={() => setAddingProduct(true)}
@@ -282,6 +279,7 @@ const Products = () => {
             </CardContent>
             <CardFooter className="flex flex-row items-center justify-end gap-x-2">
               <Button
+                disabled={isPending && isUploading}
                 type="submit"
                 className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
                 style={{
@@ -291,7 +289,7 @@ const Products = () => {
                 }}
                 variant={"default"}
               >
-                Confirm
+                {isPending ? <Loader className="animate-spin" /> : "Confirm"}
               </Button>
               <Button
                 className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
@@ -338,6 +336,7 @@ const Products = () => {
               <TableRow className="border-gray-100">
                 {[
                   "ID",
+                  "Image",
                   "Name",
                   "Category",
                   "Price",
@@ -357,60 +356,81 @@ const Products = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((p) => (
-                <TableRow
-                  key={p.id}
-                  className="border-gray-50 hover:bg-green-50/30 transition-colors"
-                >
-                  <TableCell
-                    className="text-xs text-gray-400 py-3"
-                    style={{ fontFamily: "'Lato', sans-serif" }}
+              {isFetched &&
+                products.map((p) => (
+                  <TableRow
+                    key={p.id}
+                    className="border-gray-50 hover:bg-green-50/30 transition-colors"
                   >
-                    {p.id}
-                  </TableCell>
-                  <TableCell
-                    className="font-semibold text-sm text-gray-800 py-3"
-                    style={{ fontFamily: "'Lato', sans-serif" }}
-                  >
-                    {p.name}
-                  </TableCell>
-                  <TableCell
-                    className="text-sm text-gray-500 py-3"
-                    style={{ fontFamily: "'Lato', sans-serif" }}
-                  >
-                    {p.category}
-                  </TableCell>
-                  <TableCell
-                    className="text-sm font-bold py-3"
-                    style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
-                  >
-                    {p.price}
-                  </TableCell>
-                  <TableCell
-                    className="text-sm text-gray-600 py-3"
-                    style={{ fontFamily: "'Lato', sans-serif" }}
-                  >
-                    {p.stock}
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <div className="flex items-center gap-1">
-                      <Star size={12} fill={GOLD} color={GOLD} />
-                      <span
-                        className="text-sm text-gray-600"
-                        style={{ fontFamily: "'Lato', sans-serif" }}
-                      >
-                        {p.rating}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <ProductStatusBadge status={p.status} />
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <ActionMenu />
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell
+                      className="text-xs text-gray-400 py-3"
+                      style={{ fontFamily: "'Lato', sans-serif" }}
+                    >
+                      {p.id.slice(0, 4).toUpperCase()}
+                    </TableCell>
+                    <TableCell
+                      className="text-xs text-gray-400 py-3"
+                      style={{ fontFamily: "'Lato', sans-serif" }}
+                    >
+                      <img
+                        src={p?.image || ""}
+                        className="w-auto h-10 rounded-sm"
+                      />
+                    </TableCell>
+                    <TableCell
+                      className="font-semibold text-sm text-gray-800 py-3"
+                      style={{ fontFamily: "'Lato', sans-serif" }}
+                    >
+                      {p.name}
+                    </TableCell>
+                    <TableCell
+                      className="text-sm text-gray-500 py-3"
+                      style={{ fontFamily: "'Lato', sans-serif" }}
+                    >
+                      {p.category?.name || ""}
+                    </TableCell>
+                    <TableCell
+                      className="text-sm font-bold py-3"
+                      style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
+                    >
+                      {p.price}
+                    </TableCell>
+                    <TableCell
+                      className="text-sm text-gray-600 py-3"
+                      style={{ fontFamily: "'Lato', sans-serif" }}
+                    >
+                      {p.stock}
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <div className="flex items-center gap-1">
+                        <Star size={12} fill={GOLD} color={GOLD} />
+                        <span
+                          className="text-sm text-gray-600"
+                          style={{ fontFamily: "'Lato', sans-serif" }}
+                        >
+                          0.0
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3">
+                      {p.isActive && p.stock > 20 && (
+                        <ProductStatusBadge status={"Active"} />
+                      )}
+                      {!p.isActive && (
+                        <ProductStatusBadge status={"Inactive"} />
+                      )}
+                      {p.isActive && p.stock < 20 && p.stock > 0 && (
+                        <ProductStatusBadge status={"Low Stock"} />
+                      )}
+                      {p.stock <= 0 && (
+                        <ProductStatusBadge status={"Out of Stock"} />
+                      )}
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <ActionMenu />
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </CardContent>

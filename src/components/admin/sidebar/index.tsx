@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Leaf,
   LogOut,
+  Menu,
   Settings,
   ShoppingBag,
   Tag,
@@ -25,6 +26,7 @@ type SidebarProps = {
 const NAV = [
   { key: "", label: "Dashboard", icon: LayoutDashboard },
   { key: "/products", label: "Products", icon: ShoppingBag },
+  { key: "/categories", label: "Categories", icon: Menu },
   { key: "/orders", label: "Orders", icon: ClipboardList },
   { key: "/coupons", label: "Coupons", icon: Tag },
   { key: "/customers", label: "Customers", icon: Users },
