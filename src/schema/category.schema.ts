@@ -5,4 +5,5 @@ export const CreateCategorySchema = z.object({
     .string()
     .min(3, "Name must be at least 3 characters")
     .max(120, "Name too long"),
+  image: z.string().url("Image must have a valid URL").nullable(),
 });

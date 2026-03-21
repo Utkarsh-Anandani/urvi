@@ -3,10 +3,12 @@ import z from "zod";
 
 export type CreateCategoryBody = z.infer<typeof CreateCategorySchema>;
 
-export type GetAdminCategoriesResponse = {
+export type GetCategoriesResponse = {
   status: number;
   data: {
     name: string;
     productCount: number;
+    imageURL: string | null;
+    slug: string;
   }[];
 };

@@ -3,6 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/react-query";
 import { Toaster } from "sonner";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { GetUserCategories } from "@/actions/category";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,19 +25,28 @@ export const metadata: Metadata = {
   description: "Buy all organic products online",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const client = new QueryClient();
+
+  await client.prefetchQuery({
+    queryKey: ["user-categories"],
+    queryFn: () => GetUserCategories(),
+  });
+
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ReactQueryProvider>
-          {children}
-          <Toaster />
+          <HydrationBoundary state={dehydrate(client)}>
+            {children}
+            <Toaster />
+          </HydrationBoundary>
         </ReactQueryProvider>
       </body>
     </html>

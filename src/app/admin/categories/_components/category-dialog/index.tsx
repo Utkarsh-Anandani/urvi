@@ -1,9 +1,8 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -20,13 +19,44 @@ import { useMutationData } from "@/hooks/useMutationData";
 import { CreateCategory } from "@/actions/category";
 import { toast } from "sonner";
 import { CreateCategoryBody } from "@/types/category.types";
+import FileUpload from "@/components/global/file-upload";
+import { useUpload } from "@/hooks/useUpload";
 
 const CategoryDialog = () => {
+  const [image, setImage] = useState<string | null>(null);
   const { mutate, isPending } = useMutationData(
     ["create-category"],
     CreateCategory,
     "admin-categories",
   );
+  const { upload, isUploading } = useUpload();
+
+  const handleFileUpload = async (files: File[]) => {
+    try {
+      if(!files?.length) return;
+
+      const filesData = (await upload(files, "categories")) ?? [];
+
+      const failedFiles = filesData.filter(
+        (file) => !file?.success || !file?.fileURL,
+      );
+
+      if (failedFiles.length > 0) {
+        toast(`${failedFiles.length} file(s) failed to upload`);
+        return;
+      }
+
+      if(filesData.length === 1 && filesData[0].success) {
+        setImage(filesData[0].fileURL)
+      } else {
+        toast("Something went wrong, try uploading again");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast("Something went wrong during file upload");
+    }
+  }
+
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -42,6 +72,7 @@ const CategoryDialog = () => {
 
     const payload: CreateCategoryBody = {
       name,
+      image
     };
 
     mutate(payload);
@@ -70,7 +101,16 @@ const CategoryDialog = () => {
               Add a new category, to the list of categories
             </DialogDescription>
           </DialogHeader>
-          <FieldGroup>
+          <FieldGroup className="py-4">
+            <Field>
+              <FileUpload
+               id="image"
+               accept="image/*"
+               variant="compact"
+               disabled={isUploading}
+               onChange={(files: File[]) => handleFileUpload(files)}
+               />
+            </Field>
             <Field>
               <Label htmlFor="name">Name</Label>
               <Input type="text" id="name" name="name" placeholder="Ghee" />

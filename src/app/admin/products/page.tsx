@@ -93,7 +93,7 @@ const Products = () => {
   const { data, isFetched } = useQueryData(["admin-products"], () =>
     GetAdminProducts(),
   );
-  const { status, data: products } = data as GetAdminProductsResponse;
+  const { data: products } = data as GetAdminProductsResponse;
 
   const handleFilesUpload = async (files: File[]) => {
     try {

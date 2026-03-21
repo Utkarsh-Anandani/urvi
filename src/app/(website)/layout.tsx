@@ -7,7 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <div>
-      <GlobalHeader />
+      {/* <GlobalHeader /> */}
       {children}
     </div>
   );

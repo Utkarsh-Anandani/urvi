@@ -3,12 +3,12 @@ import { useQueryData } from "@/hooks/useQueryData";
 import { PageHeader } from "../page";
 import CategoryDialog from "./_components/category-dialog";
 import { GetAdminCategories } from "@/actions/category";
-import { GetAdminCategoriesResponse } from "@/types/category.types";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GetCategoriesResponse } from "@/types/category.types";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const CategoriesPage = () => {
   const { data, isFetching, isFetched } = useQueryData(["admin-categories"], () => GetAdminCategories());
-  const { status, data: categories } = data as GetAdminCategoriesResponse;
+  const { data: categories } = data as GetCategoriesResponse;
   return (
     <main className="flex-1 overflow-y-auto p-5 lg:p-7">
       <PageHeader
@@ -21,11 +21,14 @@ const CategoriesPage = () => {
       {(!isFetching && isFetched) ? (
         <div className="w-full grid grid-cols-4 gap-x-4 gap-y-2">
           {categories.map((c) => (
-            <Card key={c.name}>
-              <CardHeader>
+            <Card className="p-0" key={c.name}>
+              <CardContent className="p-0">
+                {c.imageURL && <img className="w-full h-55 object-cover" src={c?.imageURL} alt="img" />}
+              <CardHeader className="py-4">
                 <CardTitle>{c.name}</CardTitle>
                 <CardDescription>{`${c.productCount} products in this category`}</CardDescription>
               </CardHeader>
+              </CardContent>
             </Card>
           ))}
         </div>
