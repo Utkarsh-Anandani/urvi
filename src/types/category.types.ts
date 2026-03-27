@@ -6,6 +6,7 @@ export type CreateCategoryBody = z.infer<typeof CreateCategorySchema>;
 export type GetCategoriesResponse = {
   status: number;
   data: {
+    id: string;
     name: string;
     productCount: number;
     imageURL: string | null;

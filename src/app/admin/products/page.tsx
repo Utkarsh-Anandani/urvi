@@ -49,6 +49,8 @@ import {
   GetAdminProductsResponse,
 } from "@/types/product.types";
 import { useQueryData } from "@/hooks/useQueryData";
+import { GetAdminCategories } from "@/actions/category";
+import { GetCategoriesResponse } from "@/types/category.types";
 
 type ProductStatus = "Active" | "Out of Stock" | "Low Stock" | "Inactive";
 type ImageData = {
@@ -94,6 +96,9 @@ const Products = () => {
     GetAdminProducts(),
   );
   const { data: products } = data as GetAdminProductsResponse;
+
+  const { data: categoryData, isFetching, isFetched: isFetchedCategories } = useQueryData(["admin-categories"], () => GetAdminCategories());
+  const { data: categories } = categoryData as GetCategoriesResponse;
 
   const handleFilesUpload = async (files: File[]) => {
     try {
@@ -221,10 +226,7 @@ const Products = () => {
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Categories</SelectLabel>
-                        <SelectItem value="ghee">Ghee</SelectItem>
-                        <SelectItem value="millets">Millets</SelectItem>
-                        <SelectItem value="flour">Flour</SelectItem>
-                        <SelectItem value="spices">Spices</SelectItem>
+                        {categories.map((c) => <SelectItem value={c.id}>{c.name}</SelectItem>)}
                       </SelectGroup>
                     </SelectContent>
                   </Select>

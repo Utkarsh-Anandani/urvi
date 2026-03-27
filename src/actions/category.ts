@@ -54,6 +54,7 @@ export async function GetAdminCategories() {
 
     const categories = await client.category.findMany({
       select: {
+        id: true,
         name: true,
         slug: true,
         image: {
@@ -70,6 +71,7 @@ export async function GetAdminCategories() {
     });
 
     const formatted = categories.map((cat) => ({
+      id: cat.id,
       name: cat.name,
       slug: cat.slug,
       productCount: cat._count.products,
@@ -90,6 +92,7 @@ export async function GetUserCategories() {
   try {
     const categories = await client.category.findMany({
       select: {
+        id: true,
         name: true,
         slug: true,
         image: {
@@ -106,6 +109,7 @@ export async function GetUserCategories() {
     });
 
     const formatted = categories.map((cat) => ({
+      id: cat.id,
       name: cat.name,
       slug: cat.slug,
       productCount: cat._count.products,

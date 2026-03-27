@@ -3,7 +3,7 @@ import { Facebook, Instagram, Leaf, Mail, MapPin, Phone, Twitter, Youtube } from
 import { GoldDivider } from "../../page";
 
 const Footer = () => (
-  <footer style={{ background: "#0d1f0f" }}>
+  <footer className="max-w-screen overflow-hidden" style={{ background: "#0d1f0f" }}>
     {/* Top footer */}
     <div className="max-w-7xl mx-auto px-5 lg:px-8 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
       {/* Brand */}

@@ -1,7 +1,6 @@
-"use client";
 import { Leaf } from "lucide-react";
-import { CORMORANT, GOLD, GREEN, LATO } from "@/lib/helper";
-import Header from "./_components/header";
+import { BROWN, CORMORANT, GOLD, GREEN, LATO, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
+import Header from "../../components/global/global-header";
 import Hero from "./_components/hero-section";
 import TrustBadges from "./_components/trust-badges";
 import Categories from "./_components/categories-section";
@@ -90,8 +89,8 @@ export const ImagePlaceholder = ({
       width,
       height,
       background:
-        "linear-gradient(135deg, #e8f5e9 0%, #f0fdf4 50%, #fefce8 100%)",
-      border: `1.5px dashed ${GOLD}60`,
+        `linear-gradient(135deg, #ffffff 0%, ${LIGHTER_ORANGE} 50%, #ffffff 100%)`,
+      border: `1.5px dashed ${BROWN}60`,
       borderRadius: rounded,
       ...style,
     }}
@@ -100,20 +99,20 @@ export const ImagePlaceholder = ({
       <img
         src={src}
         alt={label}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         style={{ borderRadius: rounded }}
       />
     ) : (
       <>
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center"
-          style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}20` }}
+          style={{ background: `${ORANGE}10`, border: `1px solid ${ORANGE}20` }}
         >
           <Leaf size={18} style={{ color: GREEN, opacity: 0.5 }} />
         </div>
         <span
           className="text-xs font-medium"
-          style={{ color: "#9ca3af", fontFamily: LATO }}
+          style={{ color: BROWN, fontFamily: LATO }}
         >
           {label}
         </span>

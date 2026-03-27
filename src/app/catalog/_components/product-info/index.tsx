@@ -1,0 +1,395 @@
+"use client";
+import { Badge } from "@/components/ui/badge";
+import { BROWN, CORMORANT, LATO, LIGHT_BROWN, LIGHT_ORANGE, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
+import { useState } from "react";
+import { StarRating } from "../../products/[slug]/page";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Droplets, Flame, FlaskConical, Leaf, RotateCcw, Shield, ShoppingCart, Truck, Zap } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Product } from "@/types/product.types";
+
+type Props = {
+  product: Product
+}
+
+const VARIANTS = [
+  { label: "1L Bottle", price: 425, per: "₹425/L" },
+  { label: "2L Can", price: 925, per: "₹462.5/L", popular: true },
+  { label: "5L Can", price: 2000, per: "₹400/L" },
+  { label: "5L Tin", price: 2375, per: "₹475/L" },
+  { label: "1L Glass", price: 600, per: "₹600/L" },
+  { label: "15L Tin", price: 4750, per: "₹316/L", bestValue: true },
+];
+
+const HIGHLIGHTS = [
+  {
+    icon: <Droplets size={22} />,
+    title: "Cold-Pressed Process",
+    desc: "Traditional wood-press (kolhu) below 45°C — nutrients and aroma fully intact.",
+  },
+  {
+    icon: <Leaf size={22} />,
+    title: "Unrefined & Pure",
+    desc: "Zero chemicals, zero bleaching, zero deodorising. 100% groundnut, nothing else.",
+  },
+  {
+    icon: <FlaskConical size={22} />,
+    title: "Lab Verified",
+    desc: "Every batch independently tested for purity, FFA, and adulteration.",
+  },
+  {
+    icon: <Flame size={22} />,
+    title: "High Smoke Point",
+    desc: "~230°C smoke point — handles deep-frying and tempering beautifully.",
+  },
+];
+
+const ProductInfo = ({ product }: Props) => {
+  const [selectedVariant, setSelectedVariant] = useState(1);
+  const [qty, setQty] = useState(1);
+
+  const variant = VARIANTS[selectedVariant];
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Tag + Name */}
+      <div>
+        {product && product?.tags && product.tags.map((t) => <Badge
+          variant="outline"
+          className="mb-3 text-xs font-bold tracking-widest uppercase"
+          style={{
+            borderColor: LIGHTER_ORANGE,
+            background: LIGHTER_ORANGE,
+            color: BROWN,
+            fontFamily: LATO,
+          }}
+        >
+          {t}
+        </Badge>)}
+
+        <h1
+          style={{
+            fontFamily: CORMORANT,
+            fontSize: "clamp(32px, 4vw, 48px)",
+            fontWeight: 600,
+            color: BROWN,
+            lineHeight: 1.15,
+          }}
+        >
+          Urvi's
+          <br />
+          <em style={{ color: ORANGE, fontStyle: "italic" }}>{product.name}</em>
+        </h1>
+      </div>
+
+      {/* Rating */}
+      <div className="flex items-center gap-3">
+        <StarRating rating={4.3} size={18} />
+        <span
+          className="font-bold text-sm"
+          style={{ color: BROWN, fontFamily: LATO }}
+        >
+          4.3
+        </span>
+        <span
+          className="text-sm underline cursor-pointer"
+          style={{ color: "#9a7a6e", fontFamily: LATO }}
+        >
+          888 reviews
+        </span>
+        <Badge
+          variant="secondary"
+          className="text-xs"
+          style={{
+            background: "#e8f5e9",
+            color: "#2d6a4f",
+            fontFamily: LATO,
+            fontWeight: 700,
+          }}
+        >
+          ✔ 888 happy customers
+        </Badge>
+      </div>
+
+      <Separator style={{ background: "#f0e6dc" }} />
+
+      {/* Price */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-baseline gap-3">
+          <span
+            style={{
+              fontFamily: CORMORANT,
+              fontSize: 44,
+              fontWeight: 700,
+              color: BROWN,
+              lineHeight: 1,
+            }}
+          >
+            ₹{product?.discountPrice || product.price}
+          </span>
+          {product.discountPrice && <span
+            className="text-lg line-through"
+            style={{ color: "#9a7a6e", fontFamily: LATO }}
+          >
+            ₹{product.price}
+          </span>}
+        </div>
+
+        {/* Coupon */}
+        {/* <div
+          className="flex items-center gap-3 rounded-xl px-4 py-3 w-fit"
+          style={{
+            background: "#fff8f2",
+            border: `1.5px dashed ${ORANGE}`,
+          }}
+        >
+          <span className="text-sm" style={{ color: LIGHT_BROWN, fontFamily: LATO }}>
+            Best price{" "}
+            <strong style={{ color: BROWN }}>
+              ₹{Math.round(variant.price * 0.7).toLocaleString("en-IN")}
+            </strong>{" "}
+            with coupon
+          </span>
+          <Badge
+            style={{
+              background: ORANGE,
+              color: "#fff",
+              fontFamily: LATO,
+              fontWeight: 700,
+              fontSize: "12px",
+              letterSpacing: "0.5px",
+              padding: "3px 10px",
+            }}
+          >
+            PURE30
+          </Badge>
+        </div> */}
+        <span
+            className="text-sm"
+            style={{ color: "#9a7a6e", fontFamily: LATO }}
+          >
+            MRP (incl. taxes) · {variant.per}
+          </span>
+      </div>
+
+      <Separator style={{ background: "#f0e6dc" }} />
+
+      {/* Variants */}
+      <div>
+        <p
+          className="text-xs font-bold tracking-widest uppercase mb-3"
+          style={{ color: "#9a7a6e", fontFamily: LATO }}
+        >
+          Select Variant
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {VARIANTS.map((v, i) => (
+            <TooltipProvider key={i}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setSelectedVariant(i)}
+                    className="relative rounded-xl p-3 text-left transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{
+                      border: `2px solid ${i === selectedVariant ? ORANGE : "#e8d8c8"}`,
+                      background:
+                        i === selectedVariant ? "#fff5eb" : "#fdfaf7",
+                      boxShadow:
+                        i === selectedVariant
+                          ? `0 4px 12px rgba(247,132,31,0.15)`
+                          : "none",
+                    }}
+                  >
+                    {v.popular && (
+                      <span
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-2 py-0.5 rounded-full"
+                        style={{
+                          background: ORANGE,
+                          color: "#fff",
+                          fontFamily: LATO,
+                          fontSize: "10px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Most Popular
+                      </span>
+                    )}
+                    {v.bestValue && (
+                      <span
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-2 py-0.5 rounded-full"
+                        style={{
+                          background: BROWN,
+                          color: "#fff",
+                          fontFamily: LATO,
+                          fontSize: "10px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Best Value
+                      </span>
+                    )}
+                    <div
+                      className="font-bold text-sm"
+                      style={{ color: BROWN, fontFamily: LATO }}
+                    >
+                      {v.label}
+                    </div>
+                    <div
+                      className="text-sm font-bold mt-0.5"
+                      style={{ color: i === selectedVariant ? ORANGE : "#3d2014" }}
+                    >
+                      ₹{v.price.toLocaleString("en-IN")}
+                    </div>
+                    <div className="text-xs" style={{ color: "#9a7a6e" }}>
+                      {v.per}
+                    </div>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{v.label} — {v.per}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ))}
+        </div>
+      </div>
+
+      {/* Qty + Buttons */}
+      <div className="flex items-center gap-3">
+        {/* Qty */}
+        <div
+          className="flex items-center rounded-xl overflow-hidden"
+          style={{ border: `2px solid #e8d8c8` }}
+        >
+          <button
+            onClick={() => setQty(Math.max(1, qty - 1))}
+            className="w-10 h-12 flex items-center justify-center transition-colors text-xl font-bold hover:bg-orange-50"
+            style={{ color: BROWN }}
+          >
+            −
+          </button>
+          <span
+            className="w-10 text-center font-bold text-base"
+            style={{ color: BROWN, fontFamily: LATO }}
+          >
+            {qty}
+          </span>
+          <button
+            onClick={() => setQty(qty + 1)}
+            className="w-10 h-12 flex items-center justify-center transition-colors text-xl font-bold hover:bg-orange-50"
+            style={{ color: BROWN }}
+          >
+            +
+          </button>
+        </div>
+
+        <Button
+          variant="outline"
+          className="flex-1 h-12 font-bold text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
+          style={{
+            borderColor: BROWN,
+            color: BROWN,
+            fontFamily: LATO,
+            borderWidth: 2,
+          }}
+        >
+          <ShoppingCart size={16} className="mr-2" />
+          Add to Cart
+        </Button>
+
+        <Button
+          className="flex-1 h-12 font-bold text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
+          style={{
+            background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 100%)`,
+            color: "#fff",
+            fontFamily: LATO,
+            boxShadow: `0 8px 24px rgba(85,19,5,0.3)`,
+            border: "none",
+          }}
+        >
+          <Zap size={16} className="mr-2" />
+          Buy Now
+        </Button>
+      </div>
+
+      {/* Trust Pills */}
+      <div className="flex flex-wrap gap-2">
+        {[
+          { icon: <Truck size={13} />, label: "Free Delivery ₹599+" },
+          { icon: <FlaskConical size={13} />, label: "Lab Tested" },
+          { icon: <Shield size={13} />, label: "FSSAI Certified" },
+          { icon: <RotateCcw size={13} />, label: "Easy Returns" },
+        ].map((t, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+            style={{
+              background: LIGHTER_ORANGE,
+              color: LIGHT_BROWN,
+              fontFamily: LATO,
+            }}
+          >
+            {t.icon}
+            {t.label}
+          </div>
+        ))}
+      </div>
+
+      <Separator style={{ background: "#f0e6dc" }} />
+
+      {/* Description */}
+      <div
+        className="rounded-2xl p-5"
+        style={{
+          background: "#fdfaf7",
+          border: `1px solid #f0e6dc`,
+        }}
+      >
+        <p
+          className="text-sm leading-7"
+          style={{ color: "#4a2a18", fontFamily: LATO }}
+        >
+          {product.description}
+        </p>
+      </div>
+
+      {/* Highlight Cards */}
+      <div className="grid grid-cols-2 gap-3">
+        {HIGHLIGHTS.map((h, i) => (
+          <Card
+            key={i}
+            className="border transition-all hover:shadow-md"
+            style={{ borderColor: "#f0e6dc", background: "#fdfaf7" }}
+          >
+            <CardContent className="p-4 flex gap-3">
+              <div
+                className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center mt-0.5"
+                style={{ background: LIGHTER_ORANGE, color: BROWN }}
+              >
+                {h.icon}
+              </div>
+              <div>
+                <p
+                  className="font-bold text-sm"
+                  style={{ color: BROWN, fontFamily: LATO }}
+                >
+                  {h.title}
+                </p>
+                <p
+                  className="text-xs mt-1 leading-5"
+                  style={{ color: "#9a7a6e", fontFamily: LATO }}
+                >
+                  {h.desc}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default ProductInfo;

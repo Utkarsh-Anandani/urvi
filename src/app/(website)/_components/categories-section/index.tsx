@@ -1,3 +1,4 @@
+"use client";
 import { CORMORANT, GOLD_LIGHT, GREEN, LATO } from "@/lib/helper";
 import {
   GoldDivider,
@@ -9,13 +10,6 @@ import { useQueryData } from "@/hooks/useQueryData";
 import { GetUserCategories } from "@/actions/category";
 import { GetCategoriesResponse } from "@/types/category.types";
 import { useRouter } from "next/navigation";
-
-const CATEGORIES = [
-  { name: "Skincare", count: 48, label: "Skin" },
-  { name: "Beverages", count: 32, label: "Drinks" },
-  { name: "Supplements", count: 56, label: "Health" },
-  { name: "Aromatherapy", count: 24, label: "Aroma" },
-];
 
 const Categories = () => {
   const router = useRouter();

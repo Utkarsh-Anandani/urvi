@@ -40,7 +40,7 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-screen overflow-x-hidden`}
       >
         <ReactQueryProvider>
           <HydrationBoundary state={dehydrate(client)}>
