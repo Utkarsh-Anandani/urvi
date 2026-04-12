@@ -19,3 +19,4 @@ export const LIGHT_ORANGE = "#f09d55";
 export const LIGHTER_ORANGE= "#f2d9c3";
 export const BROWN = "#551305";
 export const LIGHT_BROWN = "#6f3023";
+export const LIGHTER_BROWN = "#8f6d65";

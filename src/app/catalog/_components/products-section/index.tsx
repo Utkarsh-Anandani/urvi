@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/global/global-product-card";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
-const ProductsSection = ({ activePath }: { activePath: string }) => {
+const ProductsSection = ({ activePath, isLoggedIn }: { activePath: string, isLoggedIn: boolean }) => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const {
@@ -65,7 +65,7 @@ const ProductsSection = ({ activePath }: { activePath: string }) => {
             <ProductCard
               key={product.id}
               product={product}
-              view="grid"
+              isLoggedIn={isLoggedIn}
             />
           ))}
       </div>

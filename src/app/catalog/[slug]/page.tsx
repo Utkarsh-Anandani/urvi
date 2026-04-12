@@ -7,6 +7,7 @@ import CategoryPanel from "../_components/category-panel";
 import ProductsSection from "../_components/products-section";
 import { GetUserProducts } from "@/actions/product";
 import PageHeader from "../_components/page-header";
+import { getSession } from "@/lib/auth";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -14,6 +15,7 @@ type Props = {
 
 const page = async ({ params }: Props) => {
   const { slug = "all-products" } = await params;
+  const session = await getSession();
   const client = new QueryClient();
 
   await client.prefetchInfiniteQuery({
@@ -32,7 +34,7 @@ const page = async ({ params }: Props) => {
       <div className="w-full max-w-screen h-full flex flex-col gap-5">
         <CategoryPanel activePath={slug} />
         {/* <PageHeader slug={slug} /> */}
-        <ProductsSection activePath={slug} />
+        <ProductsSection isLoggedIn={session.loggedIn} activePath={slug} />
       </div>
     </HydrationBoundary>
   );

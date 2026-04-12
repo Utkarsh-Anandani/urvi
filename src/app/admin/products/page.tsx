@@ -51,11 +51,26 @@ import {
 import { useQueryData } from "@/hooks/useQueryData";
 import { GetAdminCategories } from "@/actions/category";
 import { GetCategoriesResponse } from "@/types/category.types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { TagInput } from "@/components/global/tag-input";
 
 type ProductStatus = "Active" | "Out of Stock" | "Low Stock" | "Inactive";
 type ImageData = {
   url: string | null;
   position: number;
+};
+type VariantType = {
+  name: string;
+  price: number;
+  discountPrice?: number;
+  stock: number;
 };
 
 const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
@@ -83,13 +98,23 @@ const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
 const Products = () => {
   const [search, setSearch] = useState("");
   const [addingProduct, setAddingProduct] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { upload, isUploading } = useUpload();
   const [imageData, setImageData] = useState<ImageData[]>([]);
+  const [variants, setVariants] = useState<VariantType[]>([]);
+  const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
+  const [variantForm, setVariantForm] = useState({
+    name: "",
+    price: "",
+    discountPrice: "",
+    stock: "",
+  });
+  const [tags, setTags] = useState<string[]>([]);
 
   const { mutate, isPending } = useMutationData(
     ["create-product"],
     CreateProduct,
-    "admin-products"
+    ["admin-products"],
   );
 
   const { data, isFetched } = useQueryData(["admin-products"], () =>
@@ -97,7 +122,11 @@ const Products = () => {
   );
   const { data: products } = data as GetAdminProductsResponse;
 
-  const { data: categoryData, isFetching, isFetched: isFetchedCategories } = useQueryData(["admin-categories"], () => GetAdminCategories());
+  const {
+    data: categoryData,
+    isFetching: isFetchingCategories,
+    isFetched: isFetchedCategories,
+  } = useQueryData(["admin-categories"], () => GetAdminCategories());
   const { data: categories } = categoryData as GetCategoriesResponse;
 
   const handleFilesUpload = async (files: File[]) => {
@@ -121,7 +150,7 @@ const Products = () => {
         position: index,
       }));
 
-      setImageData(data);
+      return data;
     } catch (error) {
       console.error("Upload error:", error);
       toast("Something went wrong during file upload");
@@ -136,15 +165,8 @@ const Products = () => {
 
       const name = formData.get("name") as string;
       const description = formData.get("description") as string;
-      const price = Number(formData.get("price"));
-      const discountPrice = formData.get("discount")
-        ? Number(formData.get("discount"))
-        : null;
-      const stock = Number(formData.get("stock"));
 
-      const categoryId = null;
-
-      if (!name || !price || stock < 0 || price < 1) {
+      if (!name || !selectedCategory) {
         toast("Please fill all required fields correctly");
         return;
       }
@@ -157,17 +179,18 @@ const Products = () => {
       const payload: CreateProductBody = {
         name,
         description,
-        price,
-        discountPrice,
-        stock,
-        categoryId,
+        categoryId: selectedCategory,
         images: imageData,
+        variants: variants,
+        tags,
       };
 
       mutate(payload);
       if (!isPending) {
         form.reset();
         setImageData([]);
+        setVariants([]);
+        setSelectedCategory(null);
         setAddingProduct(false);
       }
     } catch (error) {
@@ -219,14 +242,20 @@ const Products = () => {
                 </Field>
                 <Field>
                   <Label htmlFor="category">Category</Label>
-                  <Select name="ctegory">
+                  <Select
+                    onValueChange={(value) => setSelectedCategory(value)}
+                    disabled={isFetchingCategories}
+                    name="ctegory"
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Categories</SelectLabel>
-                        {categories.map((c) => <SelectItem value={c.id}>{c.name}</SelectItem>)}
+                        {categories.map((c) => (
+                          <SelectItem value={c.id}>{c.name}</SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -241,31 +270,57 @@ const Products = () => {
                   />
                 </Field>
                 <Field>
-                  <Label htmlFor="price">Price (in rupees)</Label>
-                  <Input
-                    type="number"
-                    id="price"
-                    name="price"
-                    placeholder="500"
-                  />
+                  <Label htmlFor="tags">Tags</Label>
+                  <TagInput id="tags" value={tags} onChange={setTags} />
                 </Field>
                 <Field>
-                  <Label htmlFor="discount">Discount Price (in rupees)</Label>
-                  <Input
-                    type="number"
-                    id="discount"
-                    name="discount"
-                    placeholder="400"
-                  />
-                </Field>
-                <Field>
-                  <Label htmlFor="stock">Stock (in units)</Label>
-                  <Input
-                    type="number"
-                    id="stock"
-                    name="stock"
-                    placeholder="20"
-                  />
+                  <div className="flex flex-row items-center justify-between">
+                    <Label htmlFor="variants">{`Variants (${variants.length})`}</Label>
+                    <Button
+                      type="button"
+                      onClick={() => setIsVariantDialogOpen(true)}
+                      className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
+                      style={{
+                        background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                        border: "none",
+                        fontFamily: "'Lato', sans-serif",
+                      }}
+                    >
+                      Add Varaint
+                    </Button>
+                  </div>
+                  {variants.length > 0 ? (
+                    <div id="variants" className="mt-3 flex flex-col gap-2">
+                      {variants.map((v) => (
+                        <div
+                          key={v.name}
+                          className="flex items-center justify-between border p-2 rounded-md"
+                        >
+                          <div className="text-sm">
+                            <p className="font-medium">{v.name}</p>
+                            <p className="text-xs text-gray-500">
+                              ₹{v.price} | Stock: {v.stock}
+                            </p>
+                          </div>
+
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() =>
+                              setVariants((prev) =>
+                                prev.filter((x) => x.name !== v.name),
+                              )
+                            }
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="w-full text-center text-neutral-300 text-sm">No variants added yet</div>
+                  )}
                 </Field>
               </FieldGroup>
               <Field>
@@ -275,7 +330,11 @@ const Products = () => {
                   accept="image/*"
                   disabled={isUploading}
                   multiple
-                  onChange={(files: File[]) => handleFilesUpload(files)}
+                  onChange={async (files: File[]) => {
+                    const data = await handleFilesUpload(files);
+                    console.log(data);
+                    setImageData(data || []);
+                  }}
                 />
               </Field>
             </CardContent>
@@ -437,6 +496,95 @@ const Products = () => {
           </Table>
         </CardContent>
       </Card>
+      <Dialog open={isVariantDialogOpen} onOpenChange={setIsVariantDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Variant</DialogTitle>
+            <DialogDescription>
+              Add a variant like size, weight, or type
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor="var-name">Name</Label>
+            <Input
+              id="var-name"
+              placeholder="Variant Name (e.g. 1kg / Large)"
+              value={variantForm.name}
+              onChange={(e) =>
+                setVariantForm({ ...variantForm, name: e.target.value })
+              }
+            />
+
+            <Label htmlFor="var-price">Price</Label>
+            <Input
+              id="var-price"
+              type="number"
+              placeholder="Price"
+              value={variantForm.price}
+              onChange={(e) =>
+                setVariantForm({ ...variantForm, price: e.target.value })
+              }
+            />
+
+            <Label htmlFor="var-discount">Discounted Price</Label>
+            <Input
+              id="var-discount"
+              type="number"
+              placeholder="Discount Price"
+              value={variantForm.discountPrice}
+              onChange={(e) =>
+                setVariantForm({
+                  ...variantForm,
+                  discountPrice: e.target.value,
+                })
+              }
+            />
+
+            <Label htmlFor="var-stock">Stock</Label>
+            <Input
+              id="var-stock"
+              type="number"
+              placeholder="Stock"
+              value={variantForm.stock}
+              onChange={(e) =>
+                setVariantForm({ ...variantForm, stock: e.target.value })
+              }
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              onClick={() => {
+                const newVariant: VariantType = {
+                  name: variantForm.name,
+                  price: Number(variantForm.price),
+                  discountPrice: variantForm.discountPrice
+                    ? Number(variantForm.discountPrice)
+                    : undefined,
+                  stock: Number(variantForm.stock),
+                };
+
+                setVariants((prev) => [...prev, newVariant]);
+
+                // reset form
+                setVariantForm({
+                  name: "",
+                  price: "",
+                  discountPrice: "",
+                  stock: "",
+                });
+
+                setIsVariantDialogOpen(false);
+              }}
+              disabled={!variantForm.name || !variantForm.price}
+            >
+              Add Variant
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 };

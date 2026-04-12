@@ -1,11 +1,13 @@
 "use client";
 import { SignInAction } from "@/actions/auth";
+import { MergeCart } from "@/actions/cart";
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useMutationData } from "@/hooks/useMutationData";
+import { getLocalCart } from "@/lib/cart";
 import { SignInBody } from "@/types/auth.types";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -21,7 +23,9 @@ const SignInForm = () => {
     ["signin"],
     SignInAction,
     undefined,
-    (data) => {
+    async (data) => {
+      const items = getLocalCart();
+      if(items && items.length > 0) await MergeCart(items);
       if (data.status === 200 || data.status === 201) {
         router.push("/");
       }
@@ -30,7 +34,6 @@ const SignInForm = () => {
 
   const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: handle sign in
 
     const payload: SignInBody = {
       email: email,

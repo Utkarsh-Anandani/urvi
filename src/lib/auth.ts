@@ -60,9 +60,11 @@ export async function signOut() {
 export async function requireAuth() {
   const session = await getSession();
 
-  if(!session.loggedIn) {
+  if(!session || !session.loggedIn) {
     redirect('/signin');
   }
+
+  return session;
 }
 
 export async function requireRole(role: 'USER' | 'ADMIN') {

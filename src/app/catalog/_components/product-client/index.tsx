@@ -8,32 +8,43 @@ import { LATO, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
 import ComparisonSection from "../../_components/comparison-section";
 import { useQueryData } from "@/hooks/useQueryData";
 import { GetUserProductDetails } from "@/actions/product";
-import { GetUserProductDetailsResponse } from "@/types/product.types";
+import { GetUserProductDetailsResponse, Variant } from "@/types/product.types";
+import { useState } from "react";
 
 type Props = {
   slug: string;
+  isLoggedIn: boolean;
 };
 
-const ProductClient = ({ slug }: Props) => {
+const ProductClient = ({ slug, isLoggedIn }: Props) => {
   const { data, isFetched, isFetching } = useQueryData(
     ["product-detail", slug],
     () => GetUserProductDetails(slug),
   );
 
   const { data: productDetail } = data as GetUserProductDetailsResponse;
+  const [selectedVariant, setSelectedVariant] = useState<Variant>(
+    productDetail.variants[0],
+  );
 
   return (
     <div
       style={{ fontFamily: LATO, background: "#fff", color: "#2a1a10" }}
       className="min-h-screen"
     >
-      {/* ── HERO PRODUCT GRID ── */}
       <main className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 gap-12 items-start">
-        <ImageCarousel category={productDetail.category?.name || null} images={productDetail?.images || []} />
-        <ProductInfo product={productDetail} />
+        <ImageCarousel
+          category={productDetail.category?.name || null}
+          images={productDetail?.images || []}
+        />
+        <ProductInfo
+          product={productDetail}
+          selectedVariant={selectedVariant}
+          setSelectedVariant={setSelectedVariant}
+          isLoggedIn={isLoggedIn}
+        />
       </main>
 
-      {/* ── TABS: Comparison + FAQ ── */}
       <section className="py-16 px-6 max-w-5xl mx-auto">
         <Tabs defaultValue="comparison">
           <TabsList
@@ -65,7 +76,14 @@ const ProductClient = ({ slug }: Props) => {
         </Tabs>
       </section>
 
-      <ReviewsSection />
+      <ReviewsSection
+        reviews={productDetail?.reviews ? productDetail.reviews : []}
+        productId={productDetail.id}
+        variantId={selectedVariant.id}
+        avgRating={productDetail.avgRating}
+        reviewCount={productDetail.reviewCount}
+        slug={slug}
+      />
     </div>
   );
 };

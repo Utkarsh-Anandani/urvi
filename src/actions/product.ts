@@ -1,9 +1,10 @@
 "use server";
-import { requireRole } from "@/lib/auth";
+import { requireAuth, requireRole } from "@/lib/auth";
 import client from "@/lib/prisma";
-import { CreateProductSchema } from "@/schema/product.schema";
+import { CreateProductSchema, CreateReviewSchema } from "@/schema/product.schema";
 import {
   CreateProductBody,
+  CreateReviewBody,
   GetAdminProductsResponse,
   GetUserProductsResponse,
 } from "@/types/product.types";
@@ -17,15 +18,19 @@ export async function CreateProduct(body: CreateProductBody) {
     const parsed = CreateProductSchema.safeParse(body);
     if (!parsed.success) return { status: 400, message: parsed.error.message };
 
-    const {
-      name,
-      description,
-      price,
-      discountPrice,
-      stock,
-      categoryId,
-      images,
-    } = parsed.data;
+    const { name, description, categoryId, images, variants, tags } = parsed.data;
+
+    const minPrice =
+      variants.length > 0 ? Math.min(...variants.map((v) => v.price)) : 0;
+
+    const discountPrices = variants
+      .map((v) => v.discountPrice)
+      .filter((p): p is number => p !== undefined);
+
+    const minDiscountPrice =
+      discountPrices.length > 0 ? Math.min(...discountPrices) : null;
+
+    const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
 
     const slug = generateSlug(name);
     const existing = await client.product.findUnique({
@@ -40,9 +45,9 @@ export async function CreateProduct(body: CreateProductBody) {
       data: {
         name,
         description,
-        price,
-        discountPrice,
-        stock,
+        price: minPrice,
+        discountPrice: minDiscountPrice,
+        stock: totalStock,
         slug,
         isActive: true,
         categoryId,
@@ -53,6 +58,24 @@ export async function CreateProduct(body: CreateProductBody) {
             position: img.position,
           })),
         },
+        variants: {
+          create: variants.map((variant) => ({
+            name: variant.name,
+            price: variant.price,
+            discountPrice: variant.discountPrice,
+            stock: variant.stock
+          }))
+        },
+        tags: {
+          create: tags.map((tagName) => ({
+            tag: {
+              connectOrCreate: {
+                where: { name: tagName },
+                create: { name: tagName },
+              }
+            }
+          }))
+        }
       },
     });
 
@@ -184,6 +207,9 @@ export async function GetUserProducts({
         isActive: true,
         createdAt: true,
         slug: true,
+        variants: true,
+        avgRating: true,
+        reviewCount: true,
 
         category: {
           select: {
@@ -260,6 +286,8 @@ export async function GetUserProductDetails(slug: string) {
         isActive: true,
         createdAt: true,
         slug: true,
+        avgRating: true,
+        reviewCount: true,
 
         category: {
           select: {
@@ -277,6 +305,8 @@ export async function GetUserProductDetails(slug: string) {
           },
         },
 
+        variants: true,
+
         tags: {
           select: {
             tag: {
@@ -286,6 +316,28 @@ export async function GetUserProductDetails(slug: string) {
             },
           },
         },
+
+        reviews: {
+          select: {
+            rating: true,
+            comment: true,
+            media: {
+              select: {
+                url: true,
+                type: true
+              }
+            },
+            createdAt: true,
+            likes: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                image: true
+              }
+            }
+          }
+        }
       },
     });
 
@@ -293,7 +345,7 @@ export async function GetUserProductDetails(slug: string) {
 
     const formatted = {
       ...product,
-      tags: product.tags?.map((t) => t.tag?.name).filter(Boolean) || []
+      tags: product.tags?.map((t) => t.tag?.name).filter(Boolean) || [],
     };
 
     return {
@@ -306,5 +358,82 @@ export async function GetUserProductDetails(slug: string) {
       status: 500,
       message: "Internal Server Error",
     };
+  }
+}
+
+export async function AddReview(body: CreateReviewBody) {
+  try {
+    const session = await requireAuth();
+
+    const parsed = CreateReviewSchema.safeParse(body);
+    if(!parsed.success) {
+      return { status: 400, message: parsed.error.message };
+    }
+
+    const { rating, comment, productId, variantId, media } = parsed.data;
+
+    const result = await client.$transaction(async (tx) => {
+      const product = await tx.product.findUnique({
+        where: {
+          id: productId,
+        },
+        select: {
+          avgRating: true,
+          reviewCount: true,
+        }
+      });
+
+      if(!product) throw new Error("Product not found");
+
+      const oldAvg = product?.avgRating || 0;
+      const oldCount = product?.reviewCount || 0;
+
+      const review = await tx.review.create({
+        data: {
+          rating,
+          comment,
+          userId: session?.id ? session.id : "",
+          productId,
+          variantId,
+          media: media ? {
+            create: media.map((m, i) => ({
+              url: m.url,
+              type: m.type,
+              position: i
+            }))
+          } : undefined
+        },
+        include: {
+          media: true
+        }
+      });
+
+      const newCount = oldCount + 1;
+      const newAvg = ((oldCount * oldAvg) + rating) / newCount;
+
+      await tx.product.update({
+        where: {
+          id: productId
+        },
+        data: {
+          avgRating: newAvg,
+          reviewCount: newCount
+        }
+      });
+
+      return review;
+    });
+
+    return {
+      status: 200,
+      data: result,
+      message: "Review posted successfully"
+    };
+  } catch (error) {
+    console.error("Error creating review: ", error);
+    return {
+      status: 500,
+      message: error
+    }
   }
 }

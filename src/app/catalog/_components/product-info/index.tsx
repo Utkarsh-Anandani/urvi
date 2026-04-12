@@ -1,73 +1,89 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { BROWN, CORMORANT, LATO, LIGHT_BROWN, LIGHT_ORANGE, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
+import {
+  BROWN,
+  CORMORANT,
+  LATO,
+  LIGHT_BROWN,
+  LIGHT_ORANGE,
+  LIGHTER_ORANGE,
+  ORANGE,
+} from "@/lib/helper";
 import { useState } from "react";
-import { StarRating } from "../../products/[slug]/page";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Droplets, Flame, FlaskConical, Leaf, RotateCcw, Shield, ShoppingCart, Truck, Zap } from "lucide-react";
+import {
+  Droplets,
+  Flame,
+  FlaskConical,
+  Leaf,
+  Loader,
+  RotateCcw,
+  Shield,
+  ShoppingCart,
+  Truck,
+  Zap,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Product } from "@/types/product.types";
+import { Product, Variant } from "@/types/product.types";
+import { useAddToCart } from "@/hooks/useCart";
+import { LocalCartItem } from "@/lib/cart";
+import { StarRating } from "../star-rating";
 
 type Props = {
-  product: Product
-}
+  product: Product;
+  selectedVariant: Variant;
+  setSelectedVariant: (v: Variant) => void;
+  isLoggedIn: boolean;
+};
 
-const VARIANTS = [
-  { label: "1L Bottle", price: 425, per: "₹425/L" },
-  { label: "2L Can", price: 925, per: "₹462.5/L", popular: true },
-  { label: "5L Can", price: 2000, per: "₹400/L" },
-  { label: "5L Tin", price: 2375, per: "₹475/L" },
-  { label: "1L Glass", price: 600, per: "₹600/L" },
-  { label: "15L Tin", price: 4750, per: "₹316/L", bestValue: true },
-];
-
-const HIGHLIGHTS = [
-  {
-    icon: <Droplets size={22} />,
-    title: "Cold-Pressed Process",
-    desc: "Traditional wood-press (kolhu) below 45°C — nutrients and aroma fully intact.",
-  },
-  {
-    icon: <Leaf size={22} />,
-    title: "Unrefined & Pure",
-    desc: "Zero chemicals, zero bleaching, zero deodorising. 100% groundnut, nothing else.",
-  },
-  {
-    icon: <FlaskConical size={22} />,
-    title: "Lab Verified",
-    desc: "Every batch independently tested for purity, FFA, and adulteration.",
-  },
-  {
-    icon: <Flame size={22} />,
-    title: "High Smoke Point",
-    desc: "~230°C smoke point — handles deep-frying and tempering beautifully.",
-  },
-];
-
-const ProductInfo = ({ product }: Props) => {
-  const [selectedVariant, setSelectedVariant] = useState(1);
+const ProductInfo = ({
+  product,
+  selectedVariant,
+  setSelectedVariant,
+  isLoggedIn,
+}: Props) => {
   const [qty, setQty] = useState(1);
+  const { mutate: addToCart, isPending: isAddToCartPending } =
+    useAddToCart(isLoggedIn);
 
-  const variant = VARIANTS[selectedVariant];
+  const handleAddToCart = () => {
+    const cartItem: LocalCartItem = {
+      productId: product.id,
+      variantId: selectedVariant.id,
+      quantity: qty,
+    };
+
+    addToCart(cartItem);
+  };
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Tag + Name */}
       <div>
-        {product && product?.tags && product.tags.map((t) => <Badge
-          variant="outline"
-          className="mb-3 text-xs font-bold tracking-widest uppercase"
-          style={{
-            borderColor: LIGHTER_ORANGE,
-            background: LIGHTER_ORANGE,
-            color: BROWN,
-            fontFamily: LATO,
-          }}
-        >
-          {t}
-        </Badge>)}
+        {product?.tags.length > 0 && (
+          <Badge
+            variant="outline"
+            className="mb-3 text-xs font-bold tracking-widest uppercase"
+            style={{
+              borderColor: LIGHTER_ORANGE,
+              background: LIGHTER_ORANGE,
+              color: BROWN,
+              fontFamily: LATO,
+            }}
+          >
+            {product.tags.map((t, i) => (
+              <div className="">
+                {t} {i !== product.tags.length - 1 ? <>&bull;</> : <></>}
+              </div>
+            ))}
+          </Badge>
+        )}
 
         <h1
           style={{
@@ -84,22 +100,21 @@ const ProductInfo = ({ product }: Props) => {
         </h1>
       </div>
 
-      {/* Rating */}
       <div className="flex items-center gap-3">
-        <StarRating rating={4.3} size={18} />
+        <StarRating rating={product.avgRating} size={18} />
         <span
           className="font-bold text-sm"
           style={{ color: BROWN, fontFamily: LATO }}
         >
-          4.3
+          {product.avgRating.toPrecision(2)}
         </span>
         <span
           className="text-sm underline cursor-pointer"
           style={{ color: "#9a7a6e", fontFamily: LATO }}
         >
-          888 reviews
+          {product.reviewCount} reviews
         </span>
-        <Badge
+        {/* <Badge
           variant="secondary"
           className="text-xs"
           style={{
@@ -110,7 +125,7 @@ const ProductInfo = ({ product }: Props) => {
           }}
         >
           ✔ 888 happy customers
-        </Badge>
+        </Badge> */}
       </div>
 
       <Separator style={{ background: "#f0e6dc" }} />
@@ -127,14 +142,16 @@ const ProductInfo = ({ product }: Props) => {
               lineHeight: 1,
             }}
           >
-            ₹{product?.discountPrice || product.price}
+            ₹{selectedVariant?.discountPrice || selectedVariant.price}
           </span>
-          {product.discountPrice && <span
-            className="text-lg line-through"
-            style={{ color: "#9a7a6e", fontFamily: LATO }}
-          >
-            ₹{product.price}
-          </span>}
+          {product.discountPrice && (
+            <span
+              className="text-lg line-through"
+              style={{ color: "#9a7a6e", fontFamily: LATO }}
+            >
+              ₹{selectedVariant.price}
+            </span>
+          )}
         </div>
 
         {/* Coupon */}
@@ -167,56 +184,57 @@ const ProductInfo = ({ product }: Props) => {
           </Badge>
         </div> */}
         <span
-            className="text-sm"
-            style={{ color: "#9a7a6e", fontFamily: LATO }}
-          >
-            MRP (incl. taxes) · {variant.per}
-          </span>
+          className="text-sm"
+          style={{ color: "#9a7a6e", fontFamily: LATO }}
+        >
+          MRP (incl. taxes)
+        </span>
       </div>
 
       <Separator style={{ background: "#f0e6dc" }} />
 
       {/* Variants */}
-      <div>
-        <p
-          className="text-xs font-bold tracking-widest uppercase mb-3"
-          style={{ color: "#9a7a6e", fontFamily: LATO }}
-        >
-          Select Variant
-        </p>
-        <div className="grid grid-cols-3 gap-2">
-          {VARIANTS.map((v, i) => (
-            <TooltipProvider key={i}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setSelectedVariant(i)}
-                    className="relative rounded-xl p-3 text-left transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    style={{
-                      border: `2px solid ${i === selectedVariant ? ORANGE : "#e8d8c8"}`,
-                      background:
-                        i === selectedVariant ? "#fff5eb" : "#fdfaf7",
-                      boxShadow:
-                        i === selectedVariant
-                          ? `0 4px 12px rgba(247,132,31,0.15)`
-                          : "none",
-                    }}
-                  >
-                    {v.popular && (
-                      <span
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-2 py-0.5 rounded-full"
-                        style={{
-                          background: ORANGE,
-                          color: "#fff",
-                          fontFamily: LATO,
-                          fontSize: "10px",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        Most Popular
-                      </span>
-                    )}
-                    {v.bestValue && (
+      {product.variants.length && (
+        <div>
+          <p
+            className="text-xs font-bold tracking-widest uppercase mb-3"
+            style={{ color: "#9a7a6e", fontFamily: LATO }}
+          >
+            Select Variant
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {product.variants.map((v, i) => (
+              <TooltipProvider key={i}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setSelectedVariant(v)}
+                      className="relative rounded-xl p-3 text-left transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      style={{
+                        border: `2px solid ${v.id === selectedVariant.id ? ORANGE : "#e8d8c8"}`,
+                        background:
+                          v.id === selectedVariant.id ? "#fff5eb" : "#fdfaf7",
+                        boxShadow:
+                          v.id === selectedVariant.id
+                            ? `0 4px 12px rgba(247,132,31,0.15)`
+                            : "none",
+                      }}
+                    >
+                      {v.id === selectedVariant.id && (
+                        <span
+                          className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-2 py-0.5 rounded-full"
+                          style={{
+                            background: ORANGE,
+                            color: "#fff",
+                            fontFamily: LATO,
+                            fontSize: "10px",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          Selected
+                        </span>
+                      )}
+                      {/* {i !== selectedVariant && (
                       <span
                         className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-2 py-0.5 rounded-full"
                         style={{
@@ -229,32 +247,39 @@ const ProductInfo = ({ product }: Props) => {
                       >
                         Best Value
                       </span>
-                    )}
-                    <div
-                      className="font-bold text-sm"
-                      style={{ color: BROWN, fontFamily: LATO }}
-                    >
-                      {v.label}
-                    </div>
-                    <div
-                      className="text-sm font-bold mt-0.5"
-                      style={{ color: i === selectedVariant ? ORANGE : "#3d2014" }}
-                    >
-                      ₹{v.price.toLocaleString("en-IN")}
-                    </div>
-                    <div className="text-xs" style={{ color: "#9a7a6e" }}>
-                      {v.per}
-                    </div>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{v.label} — {v.per}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
+                    )} */}
+                      <div
+                        className="font-bold text-sm"
+                        style={{ color: BROWN, fontFamily: LATO }}
+                      >
+                        {v.name}
+                      </div>
+                      <div
+                        className="text-sm font-bold mt-0.5"
+                        style={{
+                          color:
+                            v.id === selectedVariant.id ? ORANGE : "#3d2014",
+                        }}
+                      >
+                        ₹{(v?.discountPrice || v.price).toLocaleString("en-IN")}
+                      </div>
+                      <div className="text-xs" style={{ color: "#9a7a6e" }}>
+                        only {v.stock} units left
+                      </div>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {v.name} - ₹
+                      {(v?.discountPrice || v.price).toLocaleString("en-IN")}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Qty + Buttons */}
       <div className="flex items-center gap-3">
@@ -286,6 +311,8 @@ const ProductInfo = ({ product }: Props) => {
         </div>
 
         <Button
+          disabled={isAddToCartPending}
+          onClick={() => handleAddToCart()}
           variant="outline"
           className="flex-1 h-12 font-bold text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
           style={{
@@ -295,8 +322,14 @@ const ProductInfo = ({ product }: Props) => {
             borderWidth: 2,
           }}
         >
-          <ShoppingCart size={16} className="mr-2" />
-          Add to Cart
+          {isAddToCartPending ? (
+            <Loader size={16} className="animate-spin" />
+          ) : (
+            <>
+              <ShoppingCart size={16} className="mr-2" />
+              Add to Cart
+            </>
+          )}
         </Button>
 
         <Button
@@ -315,7 +348,7 @@ const ProductInfo = ({ product }: Props) => {
       </div>
 
       {/* Trust Pills */}
-      <div className="flex flex-wrap gap-2">
+      {/* <div className="flex flex-wrap gap-2">
         {[
           { icon: <Truck size={13} />, label: "Free Delivery ₹599+" },
           { icon: <FlaskConical size={13} />, label: "Lab Tested" },
@@ -335,7 +368,7 @@ const ProductInfo = ({ product }: Props) => {
             {t.label}
           </div>
         ))}
-      </div>
+      </div> */}
 
       <Separator style={{ background: "#f0e6dc" }} />
 
@@ -356,7 +389,7 @@ const ProductInfo = ({ product }: Props) => {
       </div>
 
       {/* Highlight Cards */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* <div className="grid grid-cols-2 gap-3">
         {HIGHLIGHTS.map((h, i) => (
           <Card
             key={i}
@@ -387,9 +420,9 @@ const ProductInfo = ({ product }: Props) => {
             </CardContent>
           </Card>
         ))}
-      </div>
+      </div> */}
     </div>
   );
-}
+};
 
 export default ProductInfo;

@@ -21,13 +21,14 @@ import { toast } from "sonner";
 import { CreateCategoryBody } from "@/types/category.types";
 import FileUpload from "@/components/global/file-upload";
 import { useUpload } from "@/hooks/useUpload";
+import { useAddToCart } from "@/hooks/useCart";
 
 const CategoryDialog = () => {
   const [image, setImage] = useState<string | null>(null);
   const { mutate, isPending } = useMutationData(
     ["create-category"],
     CreateCategory,
-    "admin-categories",
+    ["admin-categories"],
   );
   const { upload, isUploading } = useUpload();
 

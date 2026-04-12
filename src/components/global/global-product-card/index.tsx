@@ -1,29 +1,40 @@
 "use client";
+import { fmt } from "@/app/(user)/my-cart/_components/cart-page-client";
 import { ImagePlaceholder } from "@/app/(website)/page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  BROWN,
-  LATO,
-  LIGHT_ORANGE,
-  ORANGE,
-} from "@/lib/helper";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useAddToCart } from "@/hooks/useCart";
+import { LocalCartItem } from "@/lib/cart";
+import { BROWN, LATO, LIGHT_BROWN, ORANGE } from "@/lib/helper";
 import { Product } from "@/types/product.types";
-import { Heart, ShoppingBag, Star } from "lucide-react";
+import { Check, Heart, Loader, ShoppingBag, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-type AlignmentTypes = "list" | "grid";
-
-export const ProductCard = ({
-  product,
-  view,
-}: {
-  product: Product;
-  view: AlignmentTypes;
-}) => {
+export const ProductCard = ({ product, isLoggedIn }: { product: Product, isLoggedIn: boolean }) => {
   const [wished, setWished] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState(product.variants[0]);
+  const { mutate: AddToCart, isPending: isAddToCartPending } = useAddToCart(isLoggedIn);
+
+  const handleAddToCart = (variantId: string) => {
+    const cartItem: LocalCartItem = {
+      productId: product.id,
+      variantId,
+      quantity: 1
+    };
+
+    AddToCart(cartItem);
+  }
+
   const discountPercentage =
     Math.round(
       (1 -
@@ -33,172 +44,9 @@ export const ProductCard = ({
     ) || 0;
   const router = useRouter();
 
-  if (view === "list") {
-    return (
-      <Card
-        onClick={() => router.push(`/catalog/products/${product.slug}`)}
-        className="border-0 p-0 group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
-        style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
-      >
-        <CardContent className="p-0 flex flex-row">
-          {/* Image */}
-          <div className="relative shrink-0 w-40 sm:w-52">
-            <ImagePlaceholder
-              src={product?.images ? product.images[0].url : undefined}
-              height="160px"
-              label={product.name}
-              rounded="4px 0 0 4px"
-              className="group-hover:scale-105 transition-transform duration-500"
-            />
-            {discountPercentage > 25 && (
-              <Badge
-                className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm"
-                style={{
-                  background: "#dc2626",
-                  color: "#fff",
-                  border: "none",
-                  fontFamily: LATO,
-                }}
-              >
-                Flat {discountPercentage}% off
-              </Badge>
-            )}
-          </div>
-
-          {/* Info */}
-          <div className="flex flex-col justify-between flex-1 p-5">
-            <div>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p
-                    className="text-xs uppercase tracking-wider mb-1"
-                    style={{ color: BROWN, fontFamily: LATO }}
-                  >
-                    {product.category?.name}
-                  </p>
-                  <h3
-                    className="font-semibold text-base leading-tight"
-                    style={{ color: "#111827", fontFamily: LATO }}
-                  >
-                    {product.name}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setWished((w) => !w)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 hover:scale-110"
-                  style={{
-                    background: wished ? "#ffe4e6" : "#f9fafb",
-                    color: wished ? "#e11d48" : "#d1d5db",
-                  }}
-                >
-                  <Heart size={14} fill={wished ? "#e11d48" : "none"} />
-                </button>
-              </div>
-
-              {/* Stars */}
-              <div className="flex items-center gap-1.5 mt-2">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      size={11}
-                      fill={i < Math.floor(4.7) ? ORANGE : "none"}
-                      color={ORANGE}
-                    />
-                  ))}
-                </div>
-                <span
-                  className="text-xs text-gray-400"
-                  style={{ fontFamily: LATO }}
-                >
-                  {4.7} ({"1.5k"})
-                </span>
-              </div>
-
-              {/* Tags */}
-              <div className="flex flex-wrap gap-1.5 mt-2.5">
-                {product.tags.slice(0, 3).map((tag) => (
-                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                    style={{ background: `${ORANGE}12`, color: ORANGE, fontFamily: LATO }}>
-                    {tag}
-                  </span>
-                ))}
-                {product.stock <= 0 && (
-                  <span
-                    className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                    style={{
-                      background: "#fee2e2",
-                      color: "#dc2626",
-                      fontFamily: LATO,
-                    }}
-                  >
-                    Out of Stock
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Price & CTA */}
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-baseline gap-2">
-                <span
-                  className="text-xl font-bold"
-                  style={{ color: BROWN, fontFamily: LATO }}
-                >
-                  ₹{(product?.discountPrice || product.price).toLocaleString()}
-                </span>
-                {product.discountPrice && (
-                  <span
-                    className="text-sm line-through text-gray-400"
-                    style={{ fontFamily: LATO }}
-                  >
-                    ₹{product.price.toLocaleString()}
-                  </span>
-                )}
-                {product.discountPrice && (
-                  <span
-                    className="text-xs font-semibold px-1.5 py-0.5 rounded-sm"
-                    style={{
-                      background: "#dcfce7",
-                      color: ORANGE,
-                      fontFamily: LATO,
-                    }}
-                  >
-                    {Math.round(
-                      (1 - product.discountPrice / product.price) * 100,
-                    )}
-                    % off
-                  </span>
-                )}
-              </div>
-              <Button
-                disabled={product.stock <= 0}
-                className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
-                style={{
-                  background:
-                    product.stock > 0
-                      ? `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`
-                      : "#e5e7eb",
-                  border: "none",
-                  fontFamily: LATO,
-                  color: product.stock > 0 ? "#fff" : "#9ca3af",
-                }}
-              >
-                <ShoppingBag size={13} />
-                {product.stock > 0 ? "Add to Cart" : "Sold Out"}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Grid view
   return (
     <Card
-      onClick={() => router.push(`/catalog/products/${product.slug}`)}
-      className="border-0 p-0 group cursor-pointer hover:shadow-xl transition-all duration-300 overflow-hidden"
+      className="border-0 p-0 group hover:shadow-xl transition-all duration-300 overflow-hidden"
       style={{
         outline: "1px solid #f0f0f0",
         borderRadius: "4px",
@@ -207,7 +55,10 @@ export const ProductCard = ({
     >
       <CardContent className="p-0">
         {/* Image */}
-        <div className="relative overflow-hidden">
+        <div
+          onClick={() => router.push(`/catalog/products/${product.slug}`)}
+          className="relative overflow-hidden cursor-pointer"
+        >
           <ImagePlaceholder
             src={product?.images ? product.images[0].url : undefined}
             height="220px"
@@ -269,18 +120,26 @@ export const ProductCard = ({
             {product?.category?.name || ""}
           </p>
           <h3
-            className="font-semibold text-sm leading-snug mb-2 truncate"
+            onClick={() => router.push(`/catalog/products/${product.slug}`)}
+            className="font-semibold text-sm leading-snug mb-2 truncate cursor-pointer"
             style={{ color: "#111827", fontFamily: LATO }}
           >
             {product.name}
           </h3>
           <div className="flex flex-row items-center justify-start gap-2 pb-2">
             {product.tags.slice(0, 3).map((tag) => (
-                  <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full font-medium"
-                    style={{ background: `${ORANGE}12`, color: ORANGE, fontFamily: LATO }}>
-                    {tag}
-                  </span>
-                ))}
+              <span
+                key={tag}
+                className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                style={{
+                  background: `${ORANGE}12`,
+                  color: ORANGE,
+                  fontFamily: LATO,
+                }}
+              >
+                {tag}
+              </span>
+            ))}
           </div>
 
           {/* Stars */}
@@ -289,7 +148,7 @@ export const ProductCard = ({
               <Star
                 key={i}
                 size={10}
-                fill={i < Math.floor(4.7) ? ORANGE : "none"}
+                fill={i < Math.floor(product.avgRating) ? ORANGE : "none"}
                 color={ORANGE}
               />
             ))}
@@ -297,7 +156,7 @@ export const ProductCard = ({
               className="text-[10px] text-gray-400 ml-0.5"
               style={{ fontFamily: LATO }}
             >
-              ({"1.5k"})
+              ({product.reviewCount})
             </span>
           </div>
 
@@ -333,13 +192,85 @@ export const ProductCard = ({
                 </span>
               )}
             </div>
-            <button
-              disabled={product.stock <= 0}
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 disabled:opacity-40"
-              style={{ background: `${BROWN}15`, color: BROWN }}
-            >
-              <ShoppingBag size={14} />
-            </button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  disabled={product.stock <= 0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 disabled:opacity-40"
+                  style={{ background: `${BROWN}15`, color: BROWN }}
+                >
+                  <ShoppingBag size={14} />
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Product Variants</DialogTitle>
+                  <DialogDescription>
+                    Select a variant to continue
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="w-full flex flex-col gap-2 p-1">
+                  {product.variants.map((v) => (
+                    <div
+                      key={v.id}
+                      onClick={() => setSelectedVariant(v)}
+                      className={`w-full p-2 rounded-sm border ${selectedVariant.id === v.id ? "border-orange-400 bg-orange-50" : "border-neutral-400 bg-neutral-50"} flex flex-col gap-1 cursor-pointer`}
+                    >
+                      <div className="flex flex-row items-center justify-between">
+                        <div className="flex flex-row items-center gap-3">
+                          <ImagePlaceholder
+                            width="60px"
+                            height="60px"
+                            src={
+                              product.images && product.images.length > 0
+                                ? product?.images[0]?.url
+                                : undefined
+                            }
+                          />
+                          <div className="flex flex-col gap-0">
+                            <h3
+                              className={`text-base font-semibold ${selectedVariant.id === v.id ? "text-orange-400" : "text-neutral-400"}`}
+                            >
+                              {product.name} &bull; {v.name}
+                            </h3>
+                            <p
+                              className={`text-sm font-medium ${selectedVariant.id === v.id ? "text-amber-600" : "text-neutral-300"}`}
+                            >
+                              {fmt(v?.discountPrice || v.price)}
+                            </p>
+                          </div>
+                        </div>
+                        {/* {v.discountPrice && <div
+                          className={`flex items-center justify-center ${selectedVariant.id === v.id ? "text-white" : "text-neutral-300"}`}
+                        >
+                          Save{" "}
+                          {Math.round((1 - v.discountPrice / v.price) * 100)}%
+                        </div>} */}
+                        {selectedVariant.id === v.id && (
+                          <div
+                            style={{ borderColor: BROWN }}
+                            className="border-3 w-8 h-8 rounded-full bg-transparent flex items-center justify-center"
+                          >
+                            <Check size={18} style={{ color: BROWN }} strokeWidth={4} />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    disabled={isAddToCartPending}
+                    onClick={() => handleAddToCart(selectedVariant.id)}
+                    style={{ backgroundColor: LIGHT_BROWN }}
+                    className="py-5! mt-2 font-semibold"
+                  >
+                    {isAddToCartPending ? <Loader size={16} className="animate-spin" /> : "Add to Cart"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </CardContent>

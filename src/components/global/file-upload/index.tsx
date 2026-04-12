@@ -13,14 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
-
-// ─── Theme ────────────────────────────────────────────────────────────────────
-const GREEN       = "#166534";
-const GREEN_LIGHT = "#16a34a";
-const GREEN_BG    = "#f0fdf4";
-const GOLD        = "#B8960C";
-const GOLD_BG     = "#fefce8";
-const LATO        = "'Lato', sans-serif";
+import { BROWN, LATO, LIGHT_ORANGE, LIGHTER_BROWN, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type FileStatus = "idle" | "uploading" | "done" | "error";
@@ -164,10 +157,10 @@ const FileItem = ({ entry, onRemove }: FileItemProps) => {
       {/* Status icon */}
       <div className="flex items-center gap-2 flex-shrink-0">
         {status === "uploading" && (
-          <Loader2 size={16} className="animate-spin" style={{ color: GREEN }} />
+          <Loader2 size={16} className="animate-spin" style={{ color: ORANGE }} />
         )}
         {status === "done" && (
-          <CheckCircle2 size={16} style={{ color: GREEN_LIGHT }} />
+          <CheckCircle2 size={16} style={{ color: LIGHT_ORANGE }} />
         )}
         {status === "error" && (
           <AlertCircle size={16} style={{ color: "#ef4444" }} />
@@ -366,7 +359,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             style={{
               background: disabled
                 ? "#e5e7eb"
-                : `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                : `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
               border: "none",
               fontFamily: LATO,
               color: disabled ? "#9ca3af" : "#fff",
@@ -398,17 +391,17 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
               borderRadius: "4px",
               border: `2px dashed ${
                 disabled  ? "#e5e7eb" :
-                dragging  ? GREEN     :
+                dragging  ? BROWN     :
                 dragError ? "#ef4444" :
-                            `${GOLD}60`
+                            `${BROWN}60`
               }`,
               background:
                 disabled  ? "#f9fafb" :
-                dragging  ? GREEN_BG  :
+                dragging  ? LIGHTER_ORANGE :
                 dragError ? "#fff1f2" :
                             "#fffdf5",
               cursor: disabled ? "not-allowed" : "pointer",
-              boxShadow: dragging ? `0 0 0 4px ${GREEN}12` : "none",
+              boxShadow: dragging ? `0 0 0 4px ${ORANGE}12` : "none",
             }}
           >
             {/* Inner layout */}
@@ -425,14 +418,14 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 style={{
                   width:      isCompact ? 40 : 56,
                   height:     isCompact ? 40 : 56,
-                  background: dragging ? `${GREEN}18` : GOLD_BG,
-                  border:     `1px solid ${dragging ? `${GREEN}30` : `${GOLD}30`}`,
+                  background: dragging ? `${ORANGE}18` : LIGHTER_ORANGE,
+                  border:     `1px solid ${dragging ? `${ORANGE}30` : `${BROWN}30`}`,
                   transition: "all 0.2s",
                 }}
               >
                 <UploadCloud
                   size={isCompact ? 18 : 24}
-                  style={{ color: dragging ? GREEN : GOLD }}
+                  style={{ color: dragging ? ORANGE : BROWN }}
                 />
               </div>
 
@@ -463,10 +456,10 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     <span
                       className="px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider"
                       style={{
-                        background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                        background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
                         color:      "#fff",
                         fontFamily: LATO,
-                        boxShadow:  `0 2px 10px ${GREEN}30`,
+                        boxShadow:  `0 2px 10px ${BROWN}30`,
                       }}
                     >
                       Browse Files
@@ -474,7 +467,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     {multiple && maxFiles !== Infinity && (
                       <span
                         className="text-xs"
-                        style={{ color: GOLD, fontFamily: LATO }}
+                        style={{ color: BROWN, fontFamily: LATO }}
                       >
                         up to {maxFiles} file{maxFiles > 1 ? "s" : ""}
                       </span>
@@ -488,7 +481,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 <span
                   className="flex-shrink-0 px-3 py-1.5 rounded-sm text-xs font-semibold uppercase tracking-wider"
                   style={{
-                    background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                    background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
                     color:      "#fff",
                     fontFamily: LATO,
                   }}
@@ -504,7 +497,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 className="absolute bottom-0 left-0 right-0 h-px"
                 style={{
                   background: `linear-gradient(to right, transparent, ${
-                    dragging ? GREEN : GOLD
+                    dragging ? ORANGE : BROWN
                   }60, transparent)`,
                   borderRadius: "0 0 4px 4px",
                 }}
@@ -520,7 +513,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             <div className="flex items-center justify-between px-1">
               <span
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: GREEN, fontFamily: LATO }}
+                style={{ color: BROWN, fontFamily: LATO }}
               >
                 {entries.length} file{entries.length > 1 ? "s" : ""} selected
               </span>
@@ -548,14 +541,14 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             <div className="flex items-center gap-2">
               <div
                 className="h-px flex-1"
-                style={{ background: `linear-gradient(to right, transparent, ${GOLD}50)` }}
+                style={{ background: `linear-gradient(to right, transparent, ${BROWN}50)` }}
               />
-              <svg width="8" height="8" viewBox="0 0 16 16" fill={GOLD}>
+              <svg width="8" height="8" viewBox="0 0 16 16" fill={BROWN}>
                 <polygon points="8,0 10,6 16,6 11,10 13,16 8,12 3,16 5,10 0,6 6,6" />
               </svg>
               <div
                 className="h-px flex-1"
-                style={{ background: `linear-gradient(to left, transparent, ${GOLD}50)` }}
+                style={{ background: `linear-gradient(to left, transparent, ${BROWN}50)` }}
               />
             </div>
 
@@ -569,7 +562,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
               style={{ color: "#9ca3af", fontFamily: LATO }}
             >
               Total:{" "}
-              <span style={{ color: GREEN, fontWeight: 600 }}>
+              <span style={{ color: ORANGE, fontWeight: 600 }}>
                 {formatBytes(entries.reduce((acc, e) => acc + e.file.size, 0))}
               </span>
             </p>

@@ -13,7 +13,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="w-screen min-h-screen">
+    <div className="w-full min-h-screen">
       <Header />
       {children}
       <Footer />

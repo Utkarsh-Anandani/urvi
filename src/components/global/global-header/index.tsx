@@ -1,6 +1,6 @@
 "use server";
 import { getSession } from "@/lib/auth";
-import { BROWN, GOLD_LIGHT, GREEN, LATO, ORANGE } from "@/lib/helper";
+import { BROWN, LATO, ORANGE } from "@/lib/helper";
 import Navbar from "./navbar";
 
 const Header = async () => {
