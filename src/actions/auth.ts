@@ -104,3 +104,12 @@ export async function SignInAction(body: SignInBody) {
     return { status: 500, message: "Internal Server Error" };
   }
 }
+
+export async function SignOutAction() {
+  const session = await getSession();
+  session.destroy();
+  return {
+    status: 200,
+    message: "Sign Out success"
+  }
+}

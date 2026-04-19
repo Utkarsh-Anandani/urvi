@@ -151,6 +151,7 @@ const OrderSummary = ({
 
         {/* CTA */}
         <Button
+          onClick={() => router.push(`/checkout/cart`)}
           className="w-full h-13 text-sm font-bold tracking-wide uppercase mt-1 transition-all hover:scale-[1.01] hover:shadow-lg"
           style={{
             height: 52,

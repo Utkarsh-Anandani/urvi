@@ -5,7 +5,6 @@ import {
   CORMORANT,
   LATO,
   LIGHT_BROWN,
-  LIGHT_ORANGE,
   LIGHTER_ORANGE,
   ORANGE,
 } from "@/lib/helper";
@@ -18,29 +17,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import {
-  Droplets,
-  Flame,
-  FlaskConical,
-  Leaf,
-  Loader,
-  RotateCcw,
-  Shield,
-  ShoppingCart,
-  Truck,
-  Zap,
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Loader, ShoppingCart, Zap } from "lucide-react";
 import { Product, Variant } from "@/types/product.types";
 import { useAddToCart } from "@/hooks/useCart";
-import { LocalCartItem } from "@/lib/cart";
 import { StarRating } from "../star-rating";
+import { setBuyNowItem } from "@/lib/buy-now";
+import { useRouter } from "next/navigation";
+import { LocalCartItem } from "@/lib/cart";
 
 type Props = {
   product: Product;
   selectedVariant: Variant;
   setSelectedVariant: (v: Variant) => void;
   isLoggedIn: boolean;
+  slug: string;
 };
 
 const ProductInfo = ({
@@ -48,8 +38,10 @@ const ProductInfo = ({
   selectedVariant,
   setSelectedVariant,
   isLoggedIn,
+  slug,
 }: Props) => {
   const [qty, setQty] = useState(1);
+  const router = useRouter();
   const { mutate: addToCart, isPending: isAddToCartPending } =
     useAddToCart(isLoggedIn);
 
@@ -61,6 +53,21 @@ const ProductInfo = ({
     };
 
     addToCart(cartItem);
+  };
+
+  const handleBuyNow = () => {
+    const cartItem: LocalCartItem = {
+      productId: product.id,
+      variantId: selectedVariant.id,
+      quantity: qty,
+    };
+
+    setBuyNowItem(cartItem);
+    const params = new URLSearchParams({
+      source: `/catalog/products/${slug}`,
+    });
+
+    router.push(`/checkout/buy-now?${params.toString()}`);
   };
 
   return (
@@ -312,7 +319,7 @@ const ProductInfo = ({
 
         <Button
           disabled={isAddToCartPending}
-          onClick={() => handleAddToCart()}
+          onClick={handleAddToCart}
           variant="outline"
           className="flex-1 h-12 font-bold text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
           style={{
@@ -333,6 +340,7 @@ const ProductInfo = ({
         </Button>
 
         <Button
+          onClick={handleBuyNow}
           className="flex-1 h-12 font-bold text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
           style={{
             background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 100%)`,

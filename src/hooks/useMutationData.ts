@@ -18,7 +18,7 @@ export const useMutationData = (
     mutationKey,
     mutationFn,
     onSuccess(data) {
-      if (onSuccess) onSuccess(data);
+      if (onSuccess && (data?.status === 200 || data?.status === 201)) onSuccess(data);
 
       return toast(
         data?.status === 200 || data?.status === 201 ? "Success" : "Error",

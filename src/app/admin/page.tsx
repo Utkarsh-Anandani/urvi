@@ -189,7 +189,7 @@ export const ORDERS = [
 
 const RECENT_ORDERS = ORDERS.slice(0, 5);
 
-export const ActionMenu = () => (
+export const ActionMenu = ({onEdit, onDelete}: { onEdit: () => void, onDelete: () => void}) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-50">
@@ -197,14 +197,11 @@ export const ActionMenu = () => (
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" className="text-sm">
-      <DropdownMenuItem className="gap-2 cursor-pointer">
-        <Eye size={13} /> View
-      </DropdownMenuItem>
-      <DropdownMenuItem className="gap-2 cursor-pointer">
+      <DropdownMenuItem onClick={onEdit} className="gap-2 cursor-pointer">
         <Pencil size={13} /> Edit
       </DropdownMenuItem>
-      <DropdownMenuItem className="gap-2 cursor-pointer text-red-500 focus:text-red-500">
-        <Trash2 size={13} /> Delete
+      <DropdownMenuItem onClick={onDelete} className="gap-2 cursor-pointer text-red-500 focus:text-red-500">
+        <Trash2 className="text-red-500!" size={13} /> Delete
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>

@@ -19,19 +19,54 @@ enum Role {
   ADMIN
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHERS
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
+  id        String    @id @default(uuid())
+  email     String    @unique
   password  String
   salt      String
   firstName String
   lastName  String?
+  phone     String?
+  dob       String?
+  gender    Gender?
   image     String?
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   reviews   Review[]
   cart      Cart?
+  addresses Address[]
+  orders    Order[]
+}
+
+model Address {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fullName String
+  phone    String
+
+  line1      String
+  line2      String?
+  city       String
+  state      String
+  postalCode String
+  country    String
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
 }
 
 model Product {
@@ -55,10 +90,11 @@ model Product {
   variants ProductVariant[]
   tags     ProductTag[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  reviews   Review[]
-  cartItems CartItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  reviews    Review[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
 
   @@index([categoryId])
   @@index([isActive])
@@ -105,10 +141,11 @@ model ProductVariant {
 
   images ProductVariantImage[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  reviews   Review[]
-  cartItems CartItem[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  reviews    Review[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
 }
 
 model ProductVariantImage {
@@ -152,7 +189,7 @@ model Review {
   isApproved Boolean @default(true)
 
   userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -219,4 +256,77 @@ model CartItem {
 
   @@unique([cartId, productId, variantId])
   @@index([cartId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  ONLINE
+  COD
+}
+
+model Order {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  addressId String
+  address   Address @relation(fields: [addressId], references: [id], onDelete: SetNull)
+
+  method        PaymentMethod @default(ONLINE)
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(PENDING)
+
+  totalAmount Float
+  discount    Float @default(0)
+  finalAmount Float
+
+  // Razorpay integration
+  razorpayOrderId   String? @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id String @id @default(uuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  variantId String?
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
+  quantity Int
+
+  // Snapshot fields (CRITICAL)
+  name  String
+  price Float
+
+  createdAt DateTime @default(now())
 }

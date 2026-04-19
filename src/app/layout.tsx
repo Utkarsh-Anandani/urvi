@@ -12,6 +12,7 @@ import { GetUserCategories } from "@/actions/category";
 import { GetCartItems, GetLocalCartItems } from "@/actions/cart";
 import { getSession } from "@/lib/auth";
 import { getLocalCart } from "@/lib/cart";
+import { GetAllAddresses, GetUserProfile } from "@/actions/user";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,39 +43,49 @@ export default async function RootLayout({
   });
 
   await client.prefetchQuery({
+    queryKey: ["user-profile"],
+    queryFn: () => GetUserProfile(),
+  });
+
+  await client.prefetchQuery({
+    queryKey: ["user-addresses"],
+    queryFn: () => GetAllAddresses(),
+  });
+
+  await client.prefetchQuery({
     queryKey: ["user-cart"],
     queryFn: async () => {
-          if (!session || !session.loggedIn) {
-            const data = getLocalCart();
-            if (data.length === 0) {
-              return {
-                status: 200,
-                data: {
-                  totalQuantity: 0,
-                  netPriceTotal: 0,
-                  netDiscountPriceTotal: 0,
-                  cartItems: [],
-                },
-              };
-            }
-    
-            const res = await GetLocalCartItems(data);
-            if (res) {
-              return res;
-            }
-          }
-    
-          const data = await GetCartItems();
-          if (data) {
-            return data;
-          }
-    
+      if (!session || !session.loggedIn) {
+        const data = getLocalCart();
+        if (data.length === 0) {
           return {
             status: 200,
-            data: null,
+            data: {
+              totalQuantity: 0,
+              netPriceTotal: 0,
+              netDiscountPriceTotal: 0,
+              cartItems: [],
+            },
           };
-        },
-  })
+        }
+
+        const res = await GetLocalCartItems(data);
+        if (res) {
+          return res;
+        }
+      }
+
+      const data = await GetCartItems();
+      if (data) {
+        return data;
+      }
+
+      return {
+        status: 200,
+        data: null,
+      };
+    },
+  });
 
   return (
     <html suppressHydrationWarning lang="en">

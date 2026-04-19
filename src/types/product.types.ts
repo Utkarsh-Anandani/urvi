@@ -1,30 +1,17 @@
-import { CreateProductSchema, CreateReviewSchema } from "@/schema/product.schema";
+import {
+  CreateProductSchema,
+  CreateReviewSchema,
+  UpdateProductSchema,
+} from "@/schema/product.schema";
 import z from "zod";
 
 export type CreateProductBody = z.infer<typeof CreateProductSchema>;
 export type CreateReviewBody = z.infer<typeof CreateReviewSchema>;
+export type UpdateProductBody = z.infer<typeof UpdateProductSchema>;
 
 export type GetAdminProductsResponse = {
   status: number;
-  data: {
-    id: string;
-    name: string;
-    price: number;
-    stock: number;
-    isActive: boolean;
-
-    category: {
-      name: string;
-    } | null;
-
-    images:
-      | {
-          url: string;
-        }[]
-      | null;
-
-    image: string | null;
-  }[];
+  data: Product[];
 };
 
 export type GetUserProductsResponse = {
@@ -34,18 +21,18 @@ export type GetUserProductsResponse = {
 };
 
 export type GetUserProductDetailsResponse = {
-  status: number,
-  data: Product,
-  message?: string
-}
+  status: number;
+  data: Product;
+  message?: string;
+};
 
 export type Variant = {
-  id: string;
+  id?: string;
   name: string;
   price: number;
   discountPrice: number | null;
   stock: number;
-}
+};
 
 export type MediaType = "IMAGE" | "VIDEO";
 
@@ -63,7 +50,7 @@ export type Review = {
   };
   likes: number;
   createdAt: Date;
-}
+};
 
 export type Product = {
   id: string;
@@ -80,6 +67,7 @@ export type Product = {
 
   category: {
     name: string;
+    id?: string;
   } | null;
 
   images:
@@ -88,7 +76,7 @@ export type Product = {
         position: number;
       }[]
     | null;
-  
+
   tags: string[];
   variants: Variant[];
   reviews?: Review[];

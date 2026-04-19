@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { BROWN, CORMORANT, LATO, LIGHT_BROWN, LIGHTER_ORANGE } from "@/lib/helper";
 import { ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const EmptyCart = () => {
+  const router = useRouter();
   return (
     <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
       <div
@@ -29,6 +31,7 @@ const EmptyCart = () => {
         products and fill your cart with goodness.
       </p>
       <Button
+        onClick={() => router.push("/catalog/all-products")}
         className="mt-8 px-10 h-12 text-sm font-bold uppercase tracking-wide"
         style={{
           background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 100%)`,

@@ -42,6 +42,7 @@ const ProductClient = ({ slug, isLoggedIn }: Props) => {
           selectedVariant={selectedVariant}
           setSelectedVariant={setSelectedVariant}
           isLoggedIn={isLoggedIn}
+          slug={slug}
         />
       </main>
 

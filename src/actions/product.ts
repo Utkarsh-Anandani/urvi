@@ -1,12 +1,17 @@
 "use server";
 import { requireAuth, requireRole } from "@/lib/auth";
 import client from "@/lib/prisma";
-import { CreateProductSchema, CreateReviewSchema } from "@/schema/product.schema";
+import {
+  CreateProductSchema,
+  CreateReviewSchema,
+  UpdateProductSchema,
+} from "@/schema/product.schema";
 import {
   CreateProductBody,
   CreateReviewBody,
   GetAdminProductsResponse,
   GetUserProductsResponse,
+  UpdateProductBody,
 } from "@/types/product.types";
 import { generateSlug } from "@/lib/helper";
 import { categoryFilterSlugType } from "@/app/catalog/_components/category-panel";
@@ -18,7 +23,8 @@ export async function CreateProduct(body: CreateProductBody) {
     const parsed = CreateProductSchema.safeParse(body);
     if (!parsed.success) return { status: 400, message: parsed.error.message };
 
-    const { name, description, categoryId, images, variants, tags } = parsed.data;
+    const { name, description, categoryId, images, variants, tags } =
+      parsed.data;
 
     const minPrice =
       variants.length > 0 ? Math.min(...variants.map((v) => v.price)) : 0;
@@ -63,8 +69,8 @@ export async function CreateProduct(body: CreateProductBody) {
             name: variant.name,
             price: variant.price,
             discountPrice: variant.discountPrice,
-            stock: variant.stock
-          }))
+            stock: variant.stock,
+          })),
         },
         tags: {
           create: tags.map((tagName) => ({
@@ -72,10 +78,10 @@ export async function CreateProduct(body: CreateProductBody) {
               connectOrCreate: {
                 where: { name: tagName },
                 create: { name: tagName },
-              }
-            }
-          }))
-        }
+              },
+            },
+          })),
+        },
       },
     });
 
@@ -89,6 +95,138 @@ export async function CreateProduct(body: CreateProductBody) {
   }
 }
 
+export async function UpdateProduct(body: UpdateProductBody) {
+  try {
+    await requireRole("ADMIN");
+
+    const parsed = UpdateProductSchema.safeParse(body);
+    if (!parsed.success) {
+      return { status: 400, message: parsed.error.message };
+    }
+
+    const {
+      id: productId,
+      name,
+      description,
+      categoryId,
+      images,
+      variants,
+      tags,
+    } = parsed.data;
+
+    const minPrice =
+      variants.length > 0 ? Math.min(...variants.map((v) => v.price)) : 0;
+
+    const discountPrices = variants
+      .map((v) => v.discountPrice)
+      .filter((p): p is number => p !== undefined);
+
+    const minDiscountPrice =
+      discountPrices.length > 0 ? Math.min(...discountPrices) : null;
+
+    const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+
+    const slug = generateSlug(name);
+
+    const existing = await client.product.findFirst({
+      where: {
+        slug,
+        NOT: { id: productId },
+      },
+    });
+
+    if (existing) {
+      return { status: 400, message: "Name too common, try naming unique" };
+    }
+
+    await client.$transaction([
+      client.productImage.deleteMany({ where: { productId } }),
+      client.productVariant.deleteMany({ where: { productId } }),
+      client.productTag.deleteMany({ where: { productId } }),
+
+      client.product.update({
+        where: { id: productId },
+        data: {
+          name,
+          description,
+          price: minPrice,
+          discountPrice: minDiscountPrice,
+          stock: totalStock,
+          slug,
+          categoryId,
+
+          images: {
+            //@ts-ignore
+            create: images.map((img) => ({
+              url: img.url,
+              position: img.position,
+            })),
+          },
+
+          variants: {
+            create: variants.map((variant) => ({
+              name: variant.name,
+              price: variant.price,
+              discountPrice: variant.discountPrice,
+              stock: variant.stock,
+            })),
+          },
+
+          tags: {
+            create: tags.map((tagName) => ({
+              tag: {
+                connectOrCreate: {
+                  where: { name: tagName },
+                  create: { name: tagName },
+                },
+              },
+            })),
+          },
+        },
+      }),
+    ]);
+
+    return { status: 200, message: "Product updated successfully" };
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return { status: 500, message: "Product update failed" };
+  }
+}
+
+export async function DeleteProduct(productId: string) {
+  try {
+    requireRole("ADMIN");
+
+    const product = await client.product.findUnique({
+      where: {
+        id: productId,
+      },
+    });
+
+    if (!product) throw new Error("Product not found");
+
+    await client.product.update({
+      where: {
+        id: productId,
+      },
+      data: {
+        isActive: false,
+      },
+    });
+
+    return {
+      status: 200,
+      message: "Item deleted successfully!",
+    };
+  } catch (error) {
+    console.error("Error deleting product: ", error);
+    return {
+      status: 500,
+      message: "Error deleting product",
+    };
+  }
+}
+
 export async function GetAdminProducts(): Promise<GetAdminProductsResponse> {
   try {
     await requireRole("ADMIN");
@@ -97,25 +235,45 @@ export async function GetAdminProducts(): Promise<GetAdminProductsResponse> {
       orderBy: {
         createdAt: "desc",
       },
+
       select: {
-        name: true,
-        price: true,
-        stock: true,
         id: true,
+        name: true,
+        description: true,
+        price: true,
+        discountPrice: true,
+        stock: true,
         isActive: true,
+        createdAt: true,
+        slug: true,
+        variants: true,
+        avgRating: true,
+        reviewCount: true,
 
         category: {
           select: {
+            id: true,
             name: true,
           },
         },
 
         images: {
-          where: {
-            position: 0,
+          orderBy: {
+            position: "asc",
           },
           select: {
+            position: true,
             url: true,
+          },
+        },
+
+        tags: {
+          select: {
+            tag: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
@@ -123,8 +281,7 @@ export async function GetAdminProducts(): Promise<GetAdminProductsResponse> {
 
     const formatted = products.map((p) => ({
       ...p,
-      image: p.images[0]?.url || null,
-      images: null,
+      tags: p.tags.map((t) => t.tag.name),
     }));
 
     return {
@@ -324,8 +481,8 @@ export async function GetUserProductDetails(slug: string) {
             media: {
               select: {
                 url: true,
-                type: true
-              }
+                type: true,
+              },
             },
             createdAt: true,
             likes: true,
@@ -333,11 +490,11 @@ export async function GetUserProductDetails(slug: string) {
               select: {
                 firstName: true,
                 lastName: true,
-                image: true
-              }
-            }
-          }
-        }
+                image: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -366,7 +523,7 @@ export async function AddReview(body: CreateReviewBody) {
     const session = await requireAuth();
 
     const parsed = CreateReviewSchema.safeParse(body);
-    if(!parsed.success) {
+    if (!parsed.success) {
       return { status: 400, message: parsed.error.message };
     }
 
@@ -380,10 +537,10 @@ export async function AddReview(body: CreateReviewBody) {
         select: {
           avgRating: true,
           reviewCount: true,
-        }
+        },
       });
 
-      if(!product) throw new Error("Product not found");
+      if (!product) throw new Error("Product not found");
 
       const oldAvg = product?.avgRating || 0;
       const oldCount = product?.reviewCount || 0;
@@ -395,30 +552,32 @@ export async function AddReview(body: CreateReviewBody) {
           userId: session?.id ? session.id : "",
           productId,
           variantId,
-          media: media ? {
-            create: media.map((m, i) => ({
-              url: m.url,
-              type: m.type,
-              position: i
-            }))
-          } : undefined
+          media: media
+            ? {
+                create: media.map((m, i) => ({
+                  url: m.url,
+                  type: m.type,
+                  position: i,
+                })),
+              }
+            : undefined,
         },
         include: {
-          media: true
-        }
+          media: true,
+        },
       });
 
       const newCount = oldCount + 1;
-      const newAvg = ((oldCount * oldAvg) + rating) / newCount;
+      const newAvg = (oldCount * oldAvg + rating) / newCount;
 
       await tx.product.update({
         where: {
-          id: productId
+          id: productId,
         },
         data: {
           avgRating: newAvg,
-          reviewCount: newCount
-        }
+          reviewCount: newCount,
+        },
       });
 
       return review;
@@ -427,13 +586,13 @@ export async function AddReview(body: CreateReviewBody) {
     return {
       status: 200,
       data: result,
-      message: "Review posted successfully"
+      message: "Review posted successfully",
     };
   } catch (error) {
     console.error("Error creating review: ", error);
     return {
       status: 500,
-      message: error
-    }
+      message: error,
+    };
   }
 }

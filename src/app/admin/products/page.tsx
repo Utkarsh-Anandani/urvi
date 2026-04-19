@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   ActionMenu,
   GOLD,
@@ -9,7 +9,15 @@ import {
   PageHeader,
 } from "../page";
 import { Button } from "@/components/ui/button";
-import { Loader, Plus, Search, Star } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Loader,
+  Plus,
+  Search,
+  Star,
+  X,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -42,11 +50,19 @@ import { Textarea } from "@/components/ui/textarea";
 import FileUpload from "@/components/global/file-upload";
 import { useUpload } from "@/hooks/useUpload";
 import { toast } from "sonner";
-import { CreateProduct, GetAdminProducts } from "@/actions/product";
+import {
+  CreateProduct,
+  DeleteProduct,
+  GetAdminProducts,
+  UpdateProduct,
+} from "@/actions/product";
 import { useMutationData } from "@/hooks/useMutationData";
 import {
   CreateProductBody,
   GetAdminProductsResponse,
+  Product,
+  UpdateProductBody,
+  Variant,
 } from "@/types/product.types";
 import { useQueryData } from "@/hooks/useQueryData";
 import { GetAdminCategories } from "@/actions/category";
@@ -60,17 +76,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TagInput } from "@/components/global/tag-input";
+import { ORANGE } from "@/lib/helper";
 
 type ProductStatus = "Active" | "Out of Stock" | "Low Stock" | "Inactive";
 type ImageData = {
   url: string | null;
   position: number;
-};
-type VariantType = {
-  name: string;
-  price: number;
-  discountPrice?: number;
-  stock: number;
 };
 
 const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
@@ -78,7 +89,7 @@ const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
     Active: { bg: "#dcfce7", color: "#166534" },
     "Out of Stock": { bg: "#fee2e2", color: "#991b1b" },
     "Low Stock": { bg: "#fef9c3", color: "#854d0e" },
-    Inactive: { bg: "#fef9c3", color: "#854d0e" },
+    Inactive: { bg: "#e5e5e5", color: "#a3a3a3" },
   };
   const cfg = map[status] || { bg: "#f3f4f6", color: "#374151" };
   return (
@@ -101,7 +112,7 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { upload, isUploading } = useUpload();
   const [imageData, setImageData] = useState<ImageData[]>([]);
-  const [variants, setVariants] = useState<VariantType[]>([]);
+  const [variants, setVariants] = useState<Variant[]>([]);
   const [isVariantDialogOpen, setIsVariantDialogOpen] = useState(false);
   const [variantForm, setVariantForm] = useState({
     name: "",
@@ -110,10 +121,59 @@ const Products = () => {
     stock: "",
   });
   const [tags, setTags] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null,
+  );
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-  const { mutate, isPending } = useMutationData(
+  const { mutate: addProduct, isPending: isAdding } = useMutationData(
     ["create-product"],
     CreateProduct,
+    ["admin-products"],
+    () => {
+      formRef.current?.reset();
+      setImageData([]);
+      setVariants([]);
+      setSelectedCategory(null);
+      setAddingProduct(false);
+      setEditingProduct(null);
+      setTags([]);
+      setSelectedImageIndex(null);
+      setVariantForm({
+        name: "",
+        price: "",
+        discountPrice: "",
+        stock: "",
+      });
+    },
+  );
+
+  const { mutate: updateProduct, isPending: isUpdating } = useMutationData(
+    ["edit-product"],
+    UpdateProduct,
+    ["admin-products"],
+    () => {
+      formRef.current?.reset();
+      setImageData([]);
+      setVariants([]);
+      setSelectedCategory(null);
+      setAddingProduct(false);
+      setEditingProduct(null);
+      setTags([]);
+      setSelectedImageIndex(null);
+      setVariantForm({
+        name: "",
+        price: "",
+        discountPrice: "",
+        stock: "",
+      });
+    },
+  );
+
+  const { mutate: deleteProduct, isPending: isDeleting } = useMutationData(
+    ["delete-product"],
+    DeleteProduct,
     ["admin-products"],
   );
 
@@ -176,28 +236,78 @@ const Products = () => {
         return;
       }
 
-      const payload: CreateProductBody = {
-        name,
-        description,
-        categoryId: selectedCategory,
-        images: imageData,
-        variants: variants,
-        tags,
-      };
-
-      mutate(payload);
-      if (!isPending) {
-        form.reset();
-        setImageData([]);
-        setVariants([]);
-        setSelectedCategory(null);
-        setAddingProduct(false);
+      if (!editingProduct) {
+        const payload: CreateProductBody = {
+          name,
+          description,
+          categoryId: selectedCategory,
+          images: imageData,
+          variants: variants,
+          tags,
+        };
+        addProduct(payload);
+      } else {
+        const payload: UpdateProductBody = {
+          id: editingProduct.id,
+          name,
+          description,
+          categoryId: selectedCategory,
+          images: imageData,
+          variants: variants,
+          tags,
+        };
+        updateProduct(payload);
       }
     } catch (error) {
       console.error(error);
       toast("Something went wrong");
     }
   };
+
+  const moveImage = (direction: "left" | "right") => {
+    if (selectedImageIndex === null) return;
+
+    setImageData((prev) => {
+      const newArr = [...prev];
+
+      const targetIndex =
+        direction === "left" ? selectedImageIndex - 1 : selectedImageIndex + 1;
+
+      if (targetIndex < 0 || targetIndex >= newArr.length) return prev;
+
+      [newArr[selectedImageIndex], newArr[targetIndex]] = [
+        newArr[targetIndex],
+        newArr[selectedImageIndex],
+      ];
+
+      const updated = newArr.map((img, i) => ({
+        ...img,
+        position: i,
+      }));
+
+      setSelectedImageIndex(targetIndex);
+
+      return updated;
+    });
+  };
+
+  const removeImage = () => {
+    if (selectedImageIndex === null) return;
+
+    setImageData((prev) => {
+      const newArr = prev.filter((_, i) => i !== selectedImageIndex);
+
+      const updated = newArr.map((img, i) => ({
+        ...img,
+        position: i,
+      }));
+
+      return updated;
+    });
+
+    setSelectedImageIndex(null);
+  };
+
   return (
     <main className="flex-1 overflow-y-auto p-5 lg:p-7">
       <PageHeader
@@ -223,17 +333,84 @@ const Products = () => {
           style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
         >
           <CardHeader>
-            <CardTitle>Add Product</CardTitle>
+            <CardTitle>
+              {editingProduct ? "Edit Product" : "Add Product"}
+            </CardTitle>
             <CardDescription>
               Add a new product to list it on the website
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleFormSubmit}>
+          <form ref={formRef} onSubmit={handleFormSubmit}>
+            {imageData.length > 0 && (
+              <div className="flex flex-col items-center gap-5">
+                {/* Image Preview Row */}
+                <div className="flex flex-row items-center gap-3 overflow-x-auto">
+                  {imageData.map((image, index) => (
+                    <div
+                      className={`relative cursor-pointer rounded-lg ${
+                        selectedImageIndex === index
+                          ? "border-4 border-orange-400"
+                          : ""
+                      }`}
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                    >
+                      <img
+                        className="w-25 h-25 rounded-sm object-cover"
+                        src={image.url || ""}
+                      />
+
+                      {/* Position Badge */}
+                      <div
+                        style={{ backgroundColor: ORANGE }}
+                        className="flex items-center justify-center w-5 h-5 rounded-full top-1 right-1 absolute text-white text-xs"
+                      >
+                        {index + 1}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Controls */}
+                <div className="flex flex-row items-center gap-5">
+                  <Button
+                    type="button"
+                    onClick={() => moveImage("left")}
+                    disabled={
+                      selectedImageIndex === null || selectedImageIndex === 0
+                    }
+                  >
+                    <ChevronLeft />
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={removeImage}
+                    disabled={selectedImageIndex === null}
+                  >
+                    <X />
+                  </Button>
+
+                  <Button
+                    type="button"
+                    onClick={() => moveImage("right")}
+                    disabled={
+                      selectedImageIndex === null ||
+                      selectedImageIndex === imageData.length - 1
+                    }
+                  >
+                    <ChevronRight />
+                  </Button>
+                </div>
+              </div>
+            )}
             <CardContent className="flex flex-col-reverse gap-y-4 md:flex-row md:gap-x-4 py-2">
               <FieldGroup>
                 <Field>
                   <Label htmlFor="name">Name</Label>
                   <Input
+                    defaultValue={editingProduct?.name}
                     type="text"
                     id="name"
                     name="name"
@@ -243,9 +420,10 @@ const Products = () => {
                 <Field>
                   <Label htmlFor="category">Category</Label>
                   <Select
+                    value={selectedCategory || ""}
                     onValueChange={(value) => setSelectedCategory(value)}
                     disabled={isFetchingCategories}
-                    name="ctegory"
+                    name="category"
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select a category" />
@@ -263,6 +441,7 @@ const Products = () => {
                 <Field>
                   <Label htmlFor="description">Description</Label>
                   <Textarea
+                    defaultValue={editingProduct?.description || ""}
                     rows={5}
                     id="description"
                     name="description"
@@ -294,7 +473,19 @@ const Products = () => {
                       {variants.map((v) => (
                         <div
                           key={v.name}
-                          className="flex items-center justify-between border p-2 rounded-md"
+                          onClick={() => {
+                            setVariantForm({
+                              name: v.name,
+                              price: v.price.toString(),
+                              discountPrice: v.discountPrice?.toString() || "",
+                              stock: v.stock.toString(),
+                            });
+                            setIsVariantDialogOpen(true);
+                            setVariants((prev) =>
+                              prev.filter((x) => x.name !== v.name),
+                            );
+                          }}
+                          className="flex items-center justify-between border p-2 rounded-md cursor-pointer"
                         >
                           <div className="text-sm">
                             <p className="font-medium">{v.name}</p>
@@ -307,11 +498,12 @@ const Products = () => {
                             type="button"
                             variant="destructive"
                             size="sm"
-                            onClick={() =>
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setVariants((prev) =>
                                 prev.filter((x) => x.name !== v.name),
-                              )
-                            }
+                              );
+                            }}
                           >
                             Remove
                           </Button>
@@ -319,7 +511,9 @@ const Products = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="w-full text-center text-neutral-300 text-sm">No variants added yet</div>
+                    <div className="w-full text-center text-neutral-300 text-sm">
+                      No variants added yet
+                    </div>
                   )}
                 </Field>
               </FieldGroup>
@@ -330,17 +524,16 @@ const Products = () => {
                   accept="image/*"
                   disabled={isUploading}
                   multiple
-                  onChange={async (files: File[]) => {
+                  onFilesAdded={async (files: File[]) => {
                     const data = await handleFilesUpload(files);
-                    console.log(data);
-                    setImageData(data || []);
+                    setImageData((prev) => [...prev, ...(data || [])]);
                   }}
                 />
               </Field>
             </CardContent>
             <CardFooter className="flex flex-row items-center justify-end gap-x-2">
               <Button
-                disabled={isPending && isUploading}
+                disabled={isAdding || isUploading || isUpdating}
                 type="submit"
                 className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
                 style={{
@@ -350,7 +543,13 @@ const Products = () => {
                 }}
                 variant={"default"}
               >
-                {isPending ? <Loader className="animate-spin" /> : "Confirm"}
+                {isAdding || isUpdating ? (
+                  <Loader className="animate-spin" />
+                ) : editingProduct ? (
+                  "Update"
+                ) : (
+                  "Confirm"
+                )}
               </Button>
               <Button
                 className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
@@ -360,6 +559,7 @@ const Products = () => {
                 variant={"destructive"}
                 onClick={() => {
                   setAddingProduct(false);
+                  setEditingProduct(null);
                   setImageData([]);
                 }}
               >
@@ -434,7 +634,7 @@ const Products = () => {
                       style={{ fontFamily: "'Lato', sans-serif" }}
                     >
                       <img
-                        src={p?.image || ""}
+                        src={p.images ? p?.images[0].url : ""}
                         className="w-auto h-10 rounded-sm"
                       />
                     </TableCell>
@@ -469,7 +669,7 @@ const Products = () => {
                           className="text-sm text-gray-600"
                           style={{ fontFamily: "'Lato', sans-serif" }}
                         >
-                          0.0
+                          {p.avgRating}
                         </span>
                       </div>
                     </TableCell>
@@ -483,12 +683,36 @@ const Products = () => {
                       {p.isActive && p.stock < 20 && p.stock > 0 && (
                         <ProductStatusBadge status={"Low Stock"} />
                       )}
-                      {p.stock <= 0 && (
+                      {p.isActive && p.stock <= 0 && (
                         <ProductStatusBadge status={"Out of Stock"} />
                       )}
                     </TableCell>
                     <TableCell className="py-3">
-                      <ActionMenu />
+                      <ActionMenu
+                        onEdit={() => {
+                          setEditingProduct(p);
+                          setAddingProduct(true);
+
+                          setSelectedCategory(
+                            p?.category?.id ? p.category?.id : null,
+                          );
+
+                          setImageData(
+                            p.images
+                              ? p.images?.map((image) => ({
+                                  url: image.url,
+                                  position: image.position,
+                                }))
+                              : [],
+                          );
+
+                          setVariants(p.variants);
+                          setTags(p.tags);
+                        }}
+                        onDelete={() => {
+                          deleteProduct(p.id);
+                        }}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -557,12 +781,12 @@ const Products = () => {
             <Button
               type="button"
               onClick={() => {
-                const newVariant: VariantType = {
+                const newVariant: Variant = {
                   name: variantForm.name,
                   price: Number(variantForm.price),
                   discountPrice: variantForm.discountPrice
                     ? Number(variantForm.discountPrice)
-                    : undefined,
+                    : null,
                   stock: Number(variantForm.stock),
                 };
 
