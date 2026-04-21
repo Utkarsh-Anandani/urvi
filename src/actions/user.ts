@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth";
+import { requireServerAuth } from "@/lib/auth";
 import client from "@/lib/prisma";
 import {
   AddNewAddressSchema,
@@ -14,7 +14,7 @@ import {
 
 export async function GetUserProfile() {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     const total = await client.order.aggregate({
@@ -78,7 +78,7 @@ export async function GetUserProfile() {
 
 export async function UpdateUserProfile(body: UpdateUserProfileType) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.loggedIn) throw new Error("Unauthorized");
 
     const parsed = UpdateUserProfileSchema.safeParse(body);
@@ -117,7 +117,7 @@ export async function UpdateUserProfile(body: UpdateUserProfileType) {
 
 export async function DeleteUserAccount() {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.loggedIn) throw new Error("Unauthorized");
 
     await client.user.delete({
@@ -141,7 +141,7 @@ export async function DeleteUserAccount() {
 
 export async function GetAllAddresses(): Promise<GetAllAddressesReturnType> {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     const data = await client.user.findUnique({
@@ -182,7 +182,7 @@ export async function GetAllAddresses(): Promise<GetAllAddressesReturnType> {
 
 export async function AddNewAddress(body: AddNewAddressType) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     const res = AddNewAddressSchema.safeParse(body);

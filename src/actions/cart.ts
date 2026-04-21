@@ -1,12 +1,12 @@
 "use server";
 import { CartItem } from "@/app/(user)/my-cart/_components/cart-page-client";
-import { requireAuth } from "@/lib/auth";
+import { requireServerAuth } from "@/lib/auth";
 import { LocalCartItem } from "@/lib/cart";
 import client from "@/lib/prisma";
 
 export async function AddToCart(item: LocalCartItem) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     let cart = await client.cart.findUnique({
@@ -68,7 +68,7 @@ export async function AddToCart(item: LocalCartItem) {
 
 export async function RemoveFromCart(item: LocalCartItem) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     let cart = await client.cart.findUnique({
@@ -128,7 +128,7 @@ export async function RemoveFromCart(item: LocalCartItem) {
 
 export async function ClearCart() {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if(!session || !session.id) throw new Error("Unauthorized");
 
     const cart = await client.cart.findUnique({
@@ -163,7 +163,7 @@ export async function ClearCart() {
 
 export async function MergeCart(items: LocalCartItem[]) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) return { status: 401, data: "Unauthorized" };
 
     let cart = await client.cart.findUnique({
@@ -239,7 +239,7 @@ function calculateCart(items: CartItem[]) {
 
 export async function GetCartItems() {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     let cart = await client.cart.findUnique({

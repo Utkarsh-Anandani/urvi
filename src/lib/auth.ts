@@ -57,6 +57,16 @@ export async function signOut() {
   session.destroy();
 }
 
+export async function requireServerAuth() {
+  const session = await getSession();
+
+  if(!session || !session.loggedIn) {
+    return null;
+  }
+
+  return session;
+}
+
 export async function requireAuth() {
   const session = await getSession();
 

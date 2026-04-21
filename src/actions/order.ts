@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth";
+import { requireServerAuth } from "@/lib/auth";
 import { removeBuyNowItem } from "@/lib/buy-now";
 import { LocalCartItem } from "@/lib/cart";
 import client from "@/lib/prisma";
@@ -42,7 +42,7 @@ export async function CreatePostpaidOrder(
   item?: LocalCartItem,
 ) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     let items: OrderItem[] | undefined = undefined;
@@ -160,7 +160,7 @@ export async function CreatePrepaidOrder(
   item?: LocalCartItem,
 ) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     let items: OrderItem[] | undefined = undefined;
@@ -289,7 +289,7 @@ export async function VerifyPayment({
   razorpay_signature: string;
 }) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
     if (!session || !session.id) throw new Error("Unauthorized");
 
     const body = razorpay_order_id + "|" + razorpay_payment_id;

@@ -1,5 +1,5 @@
 "use server";
-import { requireAuth, requireRole } from "@/lib/auth";
+import { requireServerAuth, requireRole } from "@/lib/auth";
 import client from "@/lib/prisma";
 import {
   CreateProductSchema,
@@ -523,7 +523,7 @@ export async function GetUserProductDetails(slug: string) {
 
 export async function AddReview(body: CreateReviewBody) {
   try {
-    const session = await requireAuth();
+    const session = await requireServerAuth();
 
     const parsed = CreateReviewSchema.safeParse(body);
     if (!parsed.success) {
