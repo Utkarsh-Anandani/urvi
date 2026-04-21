@@ -13,10 +13,10 @@ import InstagramFeed from "./_components/insta-feed-section";
 import Blog from "./_components/blog-section";
 import Newsletter from "./_components/newsletter-section";
 import Footer from "./_components/footer";
-import { requireAuth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 
 const HomePage = async () => {
-  const session = await requireAuth();
+  const session = await getSession();
   return (
     <div className="min-h-screen" style={{ fontFamily: LATO }}>
       <Header />
