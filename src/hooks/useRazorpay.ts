@@ -46,6 +46,7 @@ export function useRazorpay() {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.Razorpay) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoaded(true);
       return;
     }

@@ -1,9 +1,9 @@
 import { BROWN, CORMORANT, LATO, LIGHTER_ORANGE } from "@/lib/helper";
 import Image from "next/image";
 import {
-  fmt,
-  ProductsData,
+  ProductsData
 } from "@/app/(user)/my-cart/_components/cart-page-client";
+import { fmt } from "@/lib/helper";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle2 } from "lucide-react";
 import { useBuyNow } from "@/hooks/useBuyNow";
@@ -61,7 +61,6 @@ const OrderReview = ({
               style={{ color: "#9a7a6e", fontFamily: LATO }}
             >
               {
-                //@ts-ignore
                 item?.variant?.name
               }
             </p>
@@ -71,7 +70,7 @@ const OrderReview = ({
             style={{ color: BROWN, fontFamily: LATO }}
           >
             {
-              fmt(//@ts-ignore
+              fmt(//@ts-expect-error
                 (item.variant?.discountPrice || item.variant?.price) * item.qty,
               )
             }
@@ -97,18 +96,27 @@ const OrderReview = ({
         paymentMethod === "cod" && { label: "COD Handling Fee", val: "₹49" },
       ]
         .filter(Boolean)
-        .map((row: any, i) => (
+        .map((row, i) => (
           <div
             key={i}
             className="flex justify-between text-sm"
             style={{ fontFamily: LATO }}
           >
-            <span style={{ color: "#6b5a52" }}>{row.label}</span>
+            <span style={{ color: "#6b5a52" }}>{
+              //@ts-expect-error
+            row.label
+            }</span>
             <span
               className="font-bold"
-              style={{ color: row.green ? "#2d6a4f" : BROWN }}
+              style={{ 
+                //@ts-expect-error
+                color: row.green ? "#2d6a4f" : BROWN 
+              }}
             >
-              {row.val}
+              {
+                //@ts-expect-error
+              row.val
+              }
             </span>
           </div>
         ))}

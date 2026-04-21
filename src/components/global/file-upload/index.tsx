@@ -13,7 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
-import { BROWN, LATO, LIGHT_ORANGE, LIGHTER_BROWN, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
+import { BROWN, LATO, LIGHT_ORANGE, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type FileStatus = "idle" | "uploading" | "done" | "error";

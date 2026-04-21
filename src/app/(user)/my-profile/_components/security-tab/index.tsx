@@ -1,18 +1,10 @@
 import { DeleteUserAccount } from "@/actions/user";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useMutationData } from "@/hooks/useMutationData";
 import {
-  BROWN,
   LATO,
-  LIGHT_BROWN,
-  LIGHT_ORANGE,
-  LIGHTER_ORANGE,
-  ORANGE,
 } from "@/lib/helper";
-import { Eye, EyeOff, Lock, Shield, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Shield, Trash2 } from "lucide-react";
 
 const SecurityTab = () => {
   const { mutate, isPending } = useMutationData(["delete-user"], DeleteUserAccount, ["user-account"]);

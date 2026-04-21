@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GoldDivider, GREEN, GREEN_LIGHT, PageHeader } from "../page";
+import { GoldDivider, PageHeader } from "../page";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { BROWN, LIGHT_BROWN, LIGHT_ORANGE, ORANGE } from "@/lib/helper";
 
 const SettingsPage = () => {
   return (
@@ -54,7 +55,7 @@ const SettingsPage = () => {
               <div key={f.label} className="space-y-1.5">
                 <Label
                   className="text-xs uppercase tracking-[0.12em] font-semibold"
-                  style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
+                  style={{ color: BROWN, fontFamily: "'Lato', sans-serif" }}
                 >
                   {f.label}
                 </Label>
@@ -69,7 +70,7 @@ const SettingsPage = () => {
             <Button
               className="mt-2 h-9 text-xs uppercase tracking-wider rounded-sm"
               style={{
-                background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
                 border: "none",
                 fontFamily: "'Lato', sans-serif",
               }}
@@ -141,7 +142,7 @@ const SettingsPage = () => {
                 </div>
                 <button
                   className="relative inline-flex h-5 w-9 items-center rounded-full shrink-0 mt-0.5 transition-colors"
-                  style={{ background: n.on ? GREEN : "#d1d5db" }}
+                  style={{ background: n.on ? ORANGE : "#d1d5db" }}
                 >
                   <span
                     className="inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform"
@@ -178,7 +179,7 @@ const SettingsPage = () => {
               <div key={f.label} className="space-y-1.5">
                 <Label
                   className="text-xs uppercase tracking-[0.12em] font-semibold"
-                  style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
+                  style={{ color: ORANGE, fontFamily: "'Lato', sans-serif" }}
                 >
                   {f.label}
                 </Label>
@@ -192,7 +193,7 @@ const SettingsPage = () => {
             <Button
               className="mt-2 h-9 text-xs uppercase tracking-wider rounded-sm"
               style={{
-                background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                background: `linear-gradient(135deg, ${BROWN}, ${LIGHT_BROWN})`,
                 border: "none",
                 fontFamily: "'Lato', sans-serif",
               }}

@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
   ActionMenu,
-  GOLD,
   GoldDivider,
-  GREEN,
-  GREEN_LIGHT,
   PageHeader,
 } from "../page";
 import { Plus, Tag } from "lucide-react";
@@ -17,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { BROWN, LIGHT_ORANGE, ORANGE } from "@/lib/helper";
 
 const COUPONS = [
   {
@@ -104,7 +102,7 @@ const Coupons = () => {
           <Button
             className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
             style={{
-              background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+              background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
               border: "none",
               fontFamily: "'Lato', sans-serif",
             }}
@@ -120,12 +118,12 @@ const Coupons = () => {
           {
             label: "Active Coupons",
             value: COUPONS.filter((c) => c.status === "Active").length,
-            color: GREEN,
+            color: BROWN,
           },
           {
             label: "Total Redemptions",
             value: COUPONS.reduce((a, c) => a + c.uses, 0),
-            color: GOLD,
+            color: ORANGE,
           },
           {
             label: "Expired",
@@ -208,8 +206,8 @@ const Coupons = () => {
                     <span
                       className="font-mono font-bold text-sm px-2 py-1 rounded"
                       style={{
-                        background: `${GOLD}15`,
-                        color: GOLD,
+                        background: `${BROWN}15`,
+                        color: BROWN,
                         letterSpacing: "0.08em",
                       }}
                     >
@@ -224,7 +222,7 @@ const Coupons = () => {
                   </TableCell>
                   <TableCell
                     className="text-sm font-bold py-3"
-                    style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
+                    style={{ color: BROWN, fontFamily: "'Lato', sans-serif" }}
                   >
                     {c.value}
                   </TableCell>
@@ -241,7 +239,7 @@ const Coupons = () => {
                           className="h-full rounded-full"
                           style={{
                             width: `${Math.min(100, (c.uses / c.limit) * 100)}%`,
-                            background: `linear-gradient(to right, ${GREEN}, ${GREEN_LIGHT})`,
+                            background: `linear-gradient(to right, ${ORANGE}, ${LIGHT_ORANGE})`,
                           }}
                         />
                       </div>
@@ -260,10 +258,10 @@ const Coupons = () => {
                     {c.expiry}
                   </TableCell>
                   <TableCell className="py-3">
-                    <CouponStatusBadge status={c.status} />
+                    <CouponStatusBadge status={c.status as CouponStatus} />
                   </TableCell>
                   <TableCell className="py-3">
-                    <ActionMenu />
+                    <ActionMenu onDelete={() => {}} onEdit={() => {}} />
                   </TableCell>
                 </TableRow>
               ))}

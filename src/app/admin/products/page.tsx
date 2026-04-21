@@ -2,10 +2,6 @@
 import { useRef, useState } from "react";
 import {
   ActionMenu,
-  GOLD,
-  GoldDivider,
-  GREEN,
-  GREEN_LIGHT,
   PageHeader,
 } from "../page";
 import { Button } from "@/components/ui/button";
@@ -14,7 +10,6 @@ import {
   ChevronRight,
   Loader,
   Plus,
-  Search,
   Star,
   X,
 } from "lucide-react";
@@ -76,7 +71,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { TagInput } from "@/components/global/tag-input";
-import { ORANGE } from "@/lib/helper";
+import { BROWN, fmt, LIGHT_ORANGE, ORANGE } from "@/lib/helper";
 
 type ProductStatus = "Active" | "Out of Stock" | "Low Stock" | "Inactive";
 type ImageData = {
@@ -107,7 +102,6 @@ const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
 };
 
 const Products = () => {
-  const [search, setSearch] = useState("");
   const [addingProduct, setAddingProduct] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { upload, isUploading } = useUpload();
@@ -171,7 +165,7 @@ const Products = () => {
     },
   );
 
-  const { mutate: deleteProduct, isPending: isDeleting } = useMutationData(
+  const { mutate: deleteProduct } = useMutationData(
     ["delete-product"],
     DeleteProduct,
     ["admin-products"],
@@ -185,7 +179,6 @@ const Products = () => {
   const {
     data: categoryData,
     isFetching: isFetchingCategories,
-    isFetched: isFetchedCategories,
   } = useQueryData(["admin-categories"], () => GetAdminCategories());
   const { data: categories } = categoryData as GetCategoriesResponse;
 
@@ -318,7 +311,7 @@ const Products = () => {
             onClick={() => setAddingProduct(true)}
             className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
             style={{
-              background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+              background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
               border: "none",
               fontFamily: "'Lato', sans-serif",
             }}
@@ -432,7 +425,7 @@ const Products = () => {
                       <SelectGroup>
                         <SelectLabel>Categories</SelectLabel>
                         {categories.map((c) => (
-                          <SelectItem value={c.id}>{c.name}</SelectItem>
+                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                         ))}
                       </SelectGroup>
                     </SelectContent>
@@ -460,7 +453,7 @@ const Products = () => {
                       onClick={() => setIsVariantDialogOpen(true)}
                       className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
                       style={{
-                        background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                        background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
                         border: "none",
                         fontFamily: "'Lato', sans-serif",
                       }}
@@ -537,7 +530,7 @@ const Products = () => {
                 type="submit"
                 className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
                 style={{
-                  background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                  background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
                   border: "none",
                   fontFamily: "'Lato', sans-serif",
                 }}
@@ -573,7 +566,7 @@ const Products = () => {
         className="border-0 shadow-sm"
         style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
       >
-        <CardHeader className="pb-3 pt-5 px-6">
+        {/* <CardHeader className="pb-3 pt-5 px-6">
           <div className="flex items-center gap-3">
             <div className="relative flex-1 max-w-xs">
               <Search
@@ -590,7 +583,7 @@ const Products = () => {
             </div>
           </div>
           <GoldDivider />
-        </CardHeader>
+        </CardHeader> */}
         <CardContent className="px-6 pb-5">
           <Table>
             <TableHeader>
@@ -652,9 +645,9 @@ const Products = () => {
                     </TableCell>
                     <TableCell
                       className="text-sm font-bold py-3"
-                      style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
+                      style={{ color: BROWN, fontFamily: "'Lato', sans-serif" }}
                     >
-                      {p.price}
+                      {fmt(p.price)}
                     </TableCell>
                     <TableCell
                       className="text-sm text-gray-600 py-3"
@@ -664,7 +657,7 @@ const Products = () => {
                     </TableCell>
                     <TableCell className="py-3">
                       <div className="flex items-center gap-1">
-                        <Star size={12} fill={GOLD} color={GOLD} />
+                        <Star size={12} fill={ORANGE} color={ORANGE} />
                         <span
                           className="text-sm text-gray-600"
                           style={{ fontFamily: "'Lato', sans-serif" }}

@@ -61,6 +61,7 @@ export async function GetUserProfile() {
     };
 
     const { _count, ...rest } = formatted;
+    console.log(_count);
 
     return {
       status: 200,

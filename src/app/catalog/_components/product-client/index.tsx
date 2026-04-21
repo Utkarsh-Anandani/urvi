@@ -17,7 +17,7 @@ type Props = {
 };
 
 const ProductClient = ({ slug, isLoggedIn }: Props) => {
-  const { data, isFetched, isFetching } = useQueryData(
+  const { data } = useQueryData(
     ["product-detail", slug],
     () => GetUserProductDetails(slug),
   );
@@ -32,7 +32,7 @@ const ProductClient = ({ slug, isLoggedIn }: Props) => {
       style={{ fontFamily: LATO, background: "#fff", color: "#2a1a10" }}
       className="min-h-screen"
     >
-      <main className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 gap-12 items-start">
+      <main className="max-w-6xl mx-auto px-6 py-18 grid grid-cols-2 gap-12 items-start">
         <ImageCarousel
           category={productDetail.category?.name || null}
           images={productDetail?.images || []}

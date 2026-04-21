@@ -1,10 +1,10 @@
 "use client";
 
-import { CORMORANT, GOLD, GOLD_LIGHT, GREEN, LATO } from "@/lib/helper";
+import { BROWN, CORMORANT, GOLD, LATO, LIGHT_ORANGE, LIGHTER_BROWN } from "@/lib/helper";
 import { useState } from "react";
-import { GoldDivider, ImagePlaceholder, SectionLabel, SectionTitle } from "../../page";
+import { ImagePlaceholder, SectionLabel, SectionTitle } from "../helper";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
 const TESTIMONIALS = [
   {
@@ -48,8 +48,8 @@ const Testimonials = () => {
 
   return (
     <section
-      className="py-24 px-5 lg:px-8 relative overflow-hidden"
-      style={{ background: GREEN }}
+      className="py-24 px-5 lg:px-8 relative overflow-hidden bg-orange-50"
+      // style={{ background: LIGHTER_ORANGE }}
     >
       {/* Decorative background */}
       <div
@@ -61,14 +61,13 @@ const Testimonials = () => {
 
       <div className="max-w-4xl mx-auto relative">
         <SectionLabel>Testimonials</SectionLabel>
-        <SectionTitle light>What Our Customers Say</SectionTitle>
-        <GoldDivider className="max-w-xs mx-auto mt-4 mb-12" />
+        <SectionTitle>What Our Customers Say</SectionTitle>
 
         {/* Card */}
         <Card
-          className="border-0 relative"
+          className="border-0 relative mt-10"
           style={{
-            background: "rgba(255,255,255,0.07)",
+            background: LIGHT_ORANGE,
             backdropFilter: "blur(12px)",
             outline: `1px solid rgba(255,255,255,0.12)`,
             borderRadius: "4px",
@@ -78,27 +77,21 @@ const Testimonials = () => {
             {/* Quote icon */}
             <Quote
               size={36}
-              style={{ color: GOLD, opacity: 0.4 }}
+              style={{ color: "#fff" }}
               className="mb-6"
             />
 
-            {/* Stars */}
-            <div className="flex items-center gap-1 mb-5">
-              {[...Array(t.rating)].map((_, i) => (
-                <Star key={i} size={16} fill={GOLD_LIGHT} color={GOLD_LIGHT} />
-              ))}
-            </div>
-
             <p
               className="text-xl md:text-2xl font-light leading-relaxed mb-8 italic"
-              style={{ color: "#fff", fontFamily: CORMORANT }}
+              style={{ color: BROWN, fontFamily: CORMORANT }}
             >
-              "{t.text}"
+              &quot;{t.text}&quot;
             </p>
 
             <div className="flex items-center gap-4">
               {/* Avatar placeholder */}
               <ImagePlaceholder
+                src="/story-1.JPG"
                 width="48px"
                 height="48px"
                 label="Avatar"
@@ -108,13 +101,13 @@ const Testimonials = () => {
               <div>
                 <p
                   className="font-bold text-sm"
-                  style={{ color: "#fff", fontFamily: LATO }}
+                  style={{ color: BROWN, fontFamily: LATO }}
                 >
                   {t.name}
                 </p>
                 <p
                   className="text-xs opacity-60 mt-0.5"
-                  style={{ color: "#fff", fontFamily: LATO }}
+                  style={{ color: BROWN, fontFamily: LATO }}
                 >
                   {t.location}
                 </p>
@@ -122,13 +115,13 @@ const Testimonials = () => {
               <div className="ml-auto">
                 <p
                   className="text-xs uppercase tracking-wider opacity-60"
-                  style={{ color: GOLD_LIGHT, fontFamily: LATO }}
+                  style={{ color: BROWN, fontFamily: LATO }}
                 >
                   Purchased:
                 </p>
                 <p
                   className="text-xs font-semibold"
-                  style={{ color: GOLD_LIGHT, fontFamily: LATO }}
+                  style={{ color: BROWN, fontFamily: LATO }}
                 >
                   {t.product}
                 </p>
@@ -142,7 +135,7 @@ const Testimonials = () => {
           <button
             onClick={prev}
             className="w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:bg-white/10"
-            style={{ borderColor: "rgba(255,255,255,0.3)", color: "#fff" }}
+            style={{ borderColor: BROWN, color: BROWN }}
           >
             <ChevronLeft size={18} />
           </button>
@@ -158,7 +151,7 @@ const Testimonials = () => {
                   width: i === active ? "24px" : "8px",
                   height: "8px",
                   background:
-                    i === active ? GOLD_LIGHT : "rgba(255,255,255,0.3)",
+                    i === active ? BROWN : LIGHTER_BROWN,
                 }}
               />
             ))}
@@ -167,7 +160,7 @@ const Testimonials = () => {
           <button
             onClick={next}
             className="w-10 h-10 rounded-full flex items-center justify-center border transition-all duration-200 hover:bg-white/10"
-            style={{ borderColor: "rgba(255,255,255,0.3)", color: "#fff" }}
+            style={{ borderColor: BROWN, color: BROWN }}
           >
             <ChevronRight size={18} />
           </button>

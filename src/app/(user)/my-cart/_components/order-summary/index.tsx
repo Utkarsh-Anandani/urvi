@@ -1,6 +1,6 @@
 "use client";
 import { BROWN, CORMORANT, LATO, LIGHT_BROWN, ORANGE } from "@/lib/helper";
-import { fmt } from "../cart-page-client";
+import { fmt } from "@/lib/helper";
 import { ArrowLeft, FlaskConical, RotateCcw, Shield, Tag, Truck, Zap } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -144,7 +144,7 @@ const OrderSummary = ({
               className="text-sm font-bold"
               style={{ color: "#2d6a4f", fontFamily: LATO }}
             >
-              You're saving {fmt(totalSavings)} on this order!
+              You&apos;re saving {fmt(totalSavings)} on this order!
             </span>
           </div>
         )}

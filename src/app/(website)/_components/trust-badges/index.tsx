@@ -1,4 +1,4 @@
-import { GOLD, GOLD_LIGHT, GREEN, GREEN_LIGHT, LATO } from "@/lib/helper";
+import { BROWN, GOLD_LIGHT, LATO, LIGHT_BROWN } from "@/lib/helper";
 import { Leaf, RefreshCw, ShieldCheck, Truck } from "lucide-react";
 
 const TRUST_BADGES = [
@@ -9,14 +9,14 @@ const TRUST_BADGES = [
 ];
 
 const TrustBadges = () => (
-  <section className="py-10 border-y" style={{ background: GREEN, borderColor: `${GREEN_LIGHT}` }}>
+  <section className="py-10 border-y" style={{ background: BROWN, borderColor: `${LIGHT_BROWN}` }}>
     <div className="max-w-7xl mx-auto px-5 lg:px-8">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {TRUST_BADGES.map(({ icon: Icon, label, sub }) => (
           <div key={label} className="flex items-center gap-4">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-              style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${GOLD}50` }}
+              style={{ background: "rgba(255,255,255,0.15)", border: `1px solid ${BROWN}50` }}
             >
               <Icon size={18} style={{ color: GOLD_LIGHT }} />
             </div>

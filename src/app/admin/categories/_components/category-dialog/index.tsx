@@ -14,14 +14,13 @@ import { Field, FieldGroup } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader, Plus } from "lucide-react";
-import { GREEN, GREEN_LIGHT } from "../../../page";
 import { useMutationData } from "@/hooks/useMutationData";
 import { CreateCategory } from "@/actions/category";
 import { toast } from "sonner";
 import { CreateCategoryBody } from "@/types/category.types";
 import FileUpload from "@/components/global/file-upload";
 import { useUpload } from "@/hooks/useUpload";
-import { useAddToCart } from "@/hooks/useCart";
+import { LIGHT_ORANGE, ORANGE } from "@/lib/helper";
 
 const CategoryDialog = () => {
   const [image, setImage] = useState<string | null>(null);
@@ -86,7 +85,7 @@ const CategoryDialog = () => {
           <Button
             className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
             style={{
-              background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+              background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
               border: "none",
               fontFamily: "'Lato', sans-serif",
             }}
@@ -123,7 +122,7 @@ const CategoryDialog = () => {
               type="submit"
               className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
               style={{
-                background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
                 border: "none",
                 fontFamily: "'Lato', sans-serif",
               }}

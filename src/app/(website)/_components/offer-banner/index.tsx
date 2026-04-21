@@ -1,5 +1,5 @@
 import { CORMORANT, GOLD, GOLD_LIGHT, GREEN, GREEN_MID, LATO } from "@/lib/helper";
-import { ImagePlaceholder } from "../../page";
+import { ImagePlaceholder } from "../helper";
 import { Button } from "@/components/ui/button";
 
 const OfferBanner = () => (

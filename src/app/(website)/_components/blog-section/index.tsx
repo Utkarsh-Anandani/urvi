@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { GoldDivider, ImagePlaceholder, SectionLabel, SectionTitle } from "../../page";
+import { GoldDivider, ImagePlaceholder, SectionLabel, SectionTitle } from "../helper";
 import { Badge } from "@/components/ui/badge";
 import { GREEN, LATO } from "@/lib/helper";
 import { ArrowRight } from "lucide-react";

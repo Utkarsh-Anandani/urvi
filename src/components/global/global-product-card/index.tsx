@@ -1,6 +1,6 @@
 "use client";
-import { fmt } from "@/app/(user)/my-cart/_components/cart-page-client";
-import { ImagePlaceholder } from "@/app/(website)/page";
+import { fmt } from "@/lib/helper";
+import { ImagePlaceholder } from "@/app/(website)/_components/helper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,7 +46,7 @@ export const ProductCard = ({ product, isLoggedIn }: { product: Product, isLogge
 
   return (
     <Card
-      className="border-0 p-0 group hover:shadow-xl transition-all duration-300 overflow-hidden"
+      className="min-w-75 border-0 p-0 group hover:shadow-xl transition-all duration-300 overflow-hidden"
       style={{
         outline: "1px solid #f0f0f0",
         borderRadius: "4px",
@@ -262,6 +262,7 @@ export const ProductCard = ({ product, isLoggedIn }: { product: Product, isLogge
                   ))}
                   <Button
                     disabled={isAddToCartPending}
+                    //@ts-expect-error
                     onClick={() => handleAddToCart(selectedVariant.id)}
                     style={{ backgroundColor: LIGHT_BROWN }}
                     className="py-5! mt-2 font-semibold"

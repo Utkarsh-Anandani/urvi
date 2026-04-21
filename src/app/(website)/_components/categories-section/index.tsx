@@ -1,28 +1,27 @@
 "use client";
-import { CORMORANT, GOLD_LIGHT, GREEN, LATO } from "@/lib/helper";
-import {
-  GoldDivider,
-  ImagePlaceholder,
-  SectionLabel,
-  SectionTitle,
-} from "../../page";
+import { GetUserProducts } from "@/actions/product";
+import { GoldDivider, SectionLabel, SectionTitle } from "../helper";
+import { categoryFilters, categoryFilterSlugType } from "@/app/catalog/_components/category-panel";
 import { useQueryData } from "@/hooks/useQueryData";
-import { GetUserCategories } from "@/actions/category";
-import { GetCategoriesResponse } from "@/types/category.types";
-import { useRouter } from "next/navigation";
+import { LATO } from "@/lib/helper";
+import { useState } from "react";
+import { ProductCard } from "@/components/global/global-product-card";
+import { GetUserProductsResponse } from "@/types/product.types";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const Categories = () => {
-  const router = useRouter();
+const ShopByCategory = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+  const [activeCategory, setActiveCategory] = useState("all-products");
+  const activeCategoryName =
+    categoryFilters.find((f) => {
+      return f.slug === activeCategory;
+    })?.name || categoryFilters[0].name;
 
-  const { data, isFetched } = useQueryData(
-    ["user-categories"],
-    () => GetUserCategories(),
+  const { data, isPending } = useQueryData(
+    ["homepage-products", activeCategory],
+    () => GetUserProducts({ filter: activeCategory as categoryFilterSlugType, limit: 8 }),
   );
-  const { data: categories } = data as GetCategoriesResponse;
 
-  const handleCategoryClick = (slug: string) => {
-    router.push(`/category/${slug}`);
-  };
+  const { data: productsData } = data as GetUserProductsResponse;
 
   return (
     <section className="py-20 px-5 lg:px-8" style={{ background: "#fafaf8" }}>
@@ -33,91 +32,46 @@ const Categories = () => {
         </SectionTitle>
         <GoldDivider className="max-w-xs mx-auto mt-4 mb-12" />
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {isFetched && categories.length > 0 ? (
-            categories.map((cat) => (
+        <div className="w-full max-w-screen h-full flex flex-col gap-5">
+          <div className="w-full flex items-center justify-center gap-10 py-3 cursor-pointer">
+            {categoryFilters.map((f) => (
               <div
-                onClick={() => handleCategoryClick(cat.slug)}
-                key={cat.name}
-                className="group relative overflow-hidden cursor-pointer"
-                style={{ borderRadius: "4px" }}
+                onClick={() => setActiveCategory(f.slug)}
+                key={f.name}
+                style={{
+                  fontFamily: LATO,
+                }}
+                className="flex flex-col items-center justify-center text-xs gap-1"
               >
-                {/* Category image */}
-                <ImagePlaceholder
-                  src={cat?.imageURL || undefined}
-                  height="260px"
-                  label={`${cat.name} Category`}
-                  rounded="4px"
-                  className="group-hover:scale-105 transition-transform duration-500"
+                <img
+                  className="w-18 h-18 hover:scale-105 transition-transform ease-in-out duration-100"
+                  src={
+                    activeCategoryName === f.name
+                      ? f.active_src
+                      : f.inactive_src
+                  }
+                  alt="cat"
                 />
-                {/* Overlay */}
-                <div
-                  className="absolute inset-0 flex flex-col items-center justify-end pb-6 transition-all duration-300"
-                  style={{
-                    background: `linear-gradient(to top, ${GREEN}cc 0%, transparent 60%)`,
-                    borderRadius: "4px",
-                  }}
-                >
-                  <p
-                    className="text-white font-bold text-lg tracking-wide"
-                    style={{ fontFamily: CORMORANT }}
-                  >
-                    {cat.name}
-                  </p>
-                  <p
-                    className="text-xs opacity-80 mt-0.5"
-                    style={{ color: GOLD_LIGHT, fontFamily: LATO }}
-                  >
-                    {cat.productCount} Products
-                  </p>
-                </div>
+                {f.name}
               </div>
-            ))
-          ) : isFetched && categories.length === 0 ? (
-            <div className="w-full flex items-center justify-center">
-              <h2
-                className={`text-[${GREEN}] text-xl font-semibold text-[${CORMORANT}]`}
-              >
-                No categories found
-              </h2>
+            ))}
+          </div>
+          <div className="max-w-screen!">
+            {/* 🔹 Products Grid */}
+            <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-3">
+              {isPending ? [1,2,3,4,5,6,7,8].map((i) => <Skeleton key={i} className="h-80 bg-neutral-200" />) : productsData?.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isLoggedIn={isLoggedIn}
+                />
+              ))}
             </div>
-          ) : (
-            [1, 2, 3, 4].map((c, index) => (
-              <div
-                key={index}
-                className="group relative overflow-hidden cursor-pointer"
-                style={{ borderRadius: "4px" }}
-              >
-                {/* Category image */}
-                <ImagePlaceholder
-                  height="260px"
-                  rounded="4px"
-                  className="group-hover:scale-105 transition-transform duration-500"
-                />
-                {/* Overlay */}
-                <div
-                  className="absolute inset-0 flex flex-col items-center justify-end pb-6 transition-all duration-300"
-                  style={{
-                    background: `linear-gradient(to top, ${GREEN}cc 0%, transparent 60%)`,
-                    borderRadius: "4px",
-                  }}
-                >
-                  <p
-                    className="text-white font-bold text-lg tracking-wide"
-                    style={{ fontFamily: CORMORANT }}
-                  ></p>
-                  <p
-                    className="text-xs opacity-80 mt-0.5"
-                    style={{ color: GOLD_LIGHT, fontFamily: LATO }}
-                  ></p>
-                </div>
-              </div>
-            ))
-          )}
+          </div>
         </div>
       </div>
     </section>
   );
 };
 
-export default Categories;
+export default ShopByCategory;

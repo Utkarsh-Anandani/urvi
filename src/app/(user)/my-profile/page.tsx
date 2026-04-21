@@ -26,9 +26,9 @@ import HeroBanner from "./_components/hero-banner";
 import PersonalInfoTab from "./_components/profile-info";
 import AddressesTab from "./_components/addresses-tab";
 import OrdersTab from "./_components/orders-tab";
-import WishlistTab from "./_components/wishlist-tab";
+// import WishlistTab from "./_components/wishlist-tab";
 import SecurityTab from "./_components/security-tab";
-import { fmt } from "../my-cart/_components/cart-page-client";
+import { fmt } from "@/lib/helper";
 import { useQueryData } from "@/hooks/useQueryData";
 import { GetUserProfile } from "@/actions/user";
 import { GetUserProfileReturnType } from "@/types/user.types";
@@ -89,11 +89,11 @@ function StatCard({
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { data: profileData, isPending: isFetchingProfile } = useQueryData(
+  const { data: profileData } = useQueryData(
     ["user-profile"],
     GetUserProfile,
   );
-  const { status, data: profile } = profileData as GetUserProfileReturnType;
+  const { data: profile } = profileData as GetUserProfileReturnType;
 
   useEffect(() => {
     if (!profile) {

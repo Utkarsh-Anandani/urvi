@@ -9,9 +9,9 @@ import {
   ORANGE,
 } from "@/lib/helper";
 import {
-  CartItem,
-  fmt,
+  CartItem
 } from "@/app/(user)/my-cart/_components/cart-page-client";
+import { fmt } from "@/lib/helper";
 import {
   ChevronDown,
   ChevronUp,
@@ -93,7 +93,7 @@ const OrderSummarySidebar = ({
           {expanded && (
             <div className="flex flex-col gap-3">
               {productsData.cartItems.map((item) => (
-                //@ts-ignore
+                //@ts-expect-error
                 <div key={item.variant.id} className="flex gap-2.5">
                   <div
                     className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0"
@@ -118,7 +118,7 @@ const OrderSummarySidebar = ({
                       style={{ color: "#9a7a6e", fontFamily: LATO }}
                     >
                       {
-                        //@ts-ignore
+                        //@ts-expect-error
                         item.variant.name
                       }
                     </p>
@@ -127,7 +127,7 @@ const OrderSummarySidebar = ({
                       style={{ color: BROWN, fontFamily: LATO }}
                     >
                       {fmt(
-                        //@ts-ignore
+                        //@ts-expect-error
                         (item.variant?.discountPrice || item.variant?.price) *
                           item.quantity,
                       )}
@@ -220,7 +220,7 @@ const OrderSummarySidebar = ({
                 fontFamily: LATO,
               }}
             >
-              🎉 You're saving {fmt(savings + couponDiscount)}!
+              🎉 You&apos;re saving {fmt(savings + couponDiscount)}!
             </div>
           )}
         </div>

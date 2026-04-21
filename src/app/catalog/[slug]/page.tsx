@@ -3,10 +3,10 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
-import CategoryPanel from "../_components/category-panel";
+import CategoryPanel, { categoryFilterSlugType } from "../_components/category-panel";
 import ProductsSection from "../_components/products-section";
 import { GetUserProducts } from "@/actions/product";
-import PageHeader from "../_components/page-header";
+// import PageHeader from "../_components/page-header";
 import { getSession } from "@/lib/auth";
 
 type Props = {
@@ -22,7 +22,7 @@ const page = async ({ params }: Props) => {
     queryKey: ["products", slug],
     queryFn: async ({ pageParam }) =>
       GetUserProducts({
-        filter: slug as any,
+        filter: slug as categoryFilterSlugType,
         cursor: pageParam,
         limit: 12,
       }),
@@ -31,7 +31,7 @@ const page = async ({ params }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(client)}>
-      <div className="w-full max-w-screen h-full flex flex-col gap-5">
+      <div className="w-full max-w-screen h-full flex flex-col gap-5 py-16">
         <CategoryPanel activePath={slug} />
         {/* <PageHeader slug={slug} /> */}
         <ProductsSection isLoggedIn={session.loggedIn} activePath={slug} />

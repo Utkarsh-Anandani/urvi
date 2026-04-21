@@ -1,6 +1,6 @@
 import { BROWN, LATO, LIGHT_ORANGE, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
-import { CheckoutStep } from "../../[slug]/page";
 import { Check } from "lucide-react";
+import { CheckoutStep } from "../checkout-client";
 
 const StepIndicator = ({ current }: { current: CheckoutStep }) => {
   const steps: { key: CheckoutStep; label: string }[] = [

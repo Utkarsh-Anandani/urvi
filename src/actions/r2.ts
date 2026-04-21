@@ -31,7 +31,7 @@ export async function getPresignedUrl(
       fileURL,
     };
   } catch (error) {
-    console.error;
+    console.error("Error getting presigned URL: ", error);
     return {
       success: false,
       presignedURL: null,

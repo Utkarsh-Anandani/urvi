@@ -85,7 +85,7 @@ const ProductInfo = ({
             }}
           >
             {product.tags.map((t, i) => (
-              <div className="">
+              <div key={i}>
                 {t} {i !== product.tags.length - 1 ? <>&bull;</> : <></>}
               </div>
             ))}
@@ -101,7 +101,7 @@ const ProductInfo = ({
             lineHeight: 1.15,
           }}
         >
-          Urvi's
+          Urvi&apos;s
           <br />
           <em style={{ color: ORANGE, fontStyle: "italic" }}>{product.name}</em>
         </h1>

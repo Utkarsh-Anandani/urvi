@@ -5,7 +5,7 @@ import { MapPin, CreditCard, ArrowLeft, Package } from "lucide-react";
 import { BROWN, CORMORANT, LATO, LIGHT_BROWN, ORANGE } from "@/lib/helper";
 import Navbar from "../navbar";
 import OrderConfirmed from "../order-confirmation";
-import StepIndicator from "../step-indicator";
+// import StepIndicator from "../step-indicator";
 import SectionCard from "../section-card";
 import AddressSection from "../address-card";
 import PaymentSection from "../payment-section";
@@ -36,7 +36,7 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [confirmed, setConfirmed] = useState(false);
 
-  const { data, isFetching } = useBuyNow(slug);
+  const { data } = useBuyNow(slug);
   const { data: productsData } = data as ProductsData;
 
   if (!productsData) return null;

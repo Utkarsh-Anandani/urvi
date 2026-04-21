@@ -32,7 +32,7 @@ const AddressSection = ({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { data, isFetching, isFetched } = useQueryData(["user-addresses"], () =>
+  const { data } = useQueryData(["user-addresses"], () =>
     GetAllAddresses(),
   );
   const { data: addresses } = data as GetAllAddressesReturnType;

@@ -1,8 +1,8 @@
 "use client";
 
-import { CORMORANT, GOLD, GREEN, GREEN_LIGHT, LATO } from "@/lib/helper";
+import { CORMORANT, GOLD, GREEN, LATO, LIGHT_BROWN, BROWN } from "@/lib/helper";
 import { useState } from "react";
-import { GoldDivider, SectionLabel } from "../../page";
+import { GoldDivider, SectionLabel } from "../helper";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
@@ -19,9 +19,10 @@ const Newsletter = () => {
 
   return (
     <section
+      id="newsletter"
       className="py-24 px-5 lg:px-8 relative overflow-hidden"
       style={{
-        background: "radial-gradient(ellipse at 50% 50%, #dcfce7 0%, #fff 60%, #fefce8 100%)",
+        background: "radial-gradient(ellipse at 50% 50%, #f2d9c3 0%, #fff 60%, #fefce8 100%)",
       }}
     >
       {/* Decorative corners */}
@@ -61,11 +62,11 @@ const Newsletter = () => {
               type="submit"
               className="h-12 px-7 text-xs uppercase tracking-wider rounded-sm whitespace-nowrap"
               style={{
-                background: `linear-gradient(135deg, ${GREEN}, ${GREEN_LIGHT})`,
+                background: `linear-gradient(135deg, ${BROWN}, ${LIGHT_BROWN})`,
                 border: "none",
                 fontFamily: LATO,
                 color: "#fff",
-                boxShadow: `0 4px 16px ${GREEN}30`,
+                boxShadow: `0 4px 16px ${BROWN}30`,
               }}
             >
               Subscribe
@@ -78,7 +79,7 @@ const Newsletter = () => {
           >
             <Check size={18} style={{ color: GREEN }} />
             <p className="text-sm font-semibold" style={{ color: GREEN, fontFamily: LATO }}>
-              Thank you! You're now part of the Urvi Circle.
+              Thank you! You&apos;re now part of the Urvi Circle.
             </p>
           </div>
         )}

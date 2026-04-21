@@ -1,5 +1,4 @@
 import {
-  Enabled,
   QueryFunction,
   QueryKey,
   useQuery,
@@ -7,8 +6,7 @@ import {
 
 export const useQueryData = (
   queryKey: QueryKey,
-  queryFn: QueryFunction,
-  enabled?: Enabled
+  queryFn: QueryFunction
 ) => {
   const { data, isPending, isFetched, refetch, isFetching } = useQuery({
     queryKey,

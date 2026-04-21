@@ -13,6 +13,8 @@ import { GetCartItems, GetLocalCartItems } from "@/actions/cart";
 import { getSession } from "@/lib/auth";
 import { getLocalCart } from "@/lib/cart";
 import { GetAllAddresses, GetUserProfile } from "@/actions/user";
+import { categoryFilterSlugType } from "@/app/catalog/_components/category-panel";
+import { GetUserProducts } from "@/actions/product";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +38,29 @@ export default async function RootLayout({
 }>) {
   const client = new QueryClient();
   const session = await getSession();
+  const filters: categoryFilterSlugType[] = [
+    "all-products",
+    "best-deals",
+    "ghee",
+    "newly-launched",
+    "oils",
+    "superfoods",
+    "under-499",
+    "under-999",
+    "value-combos",
+  ];
+
+  await Promise.all(
+    filters.map((f) =>
+      client.prefetchQuery({
+        queryKey: ["homepage-products", f],
+        queryFn: () => GetUserProducts({
+          filter: f as categoryFilterSlugType,
+          limit: 8
+        }),
+      }),
+    ),
+  );
 
   await client.prefetchQuery({
     queryKey: ["user-categories"],

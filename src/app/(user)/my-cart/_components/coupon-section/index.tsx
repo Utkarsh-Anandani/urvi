@@ -1,10 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BROWN, LATO, LIGHT_BROWN, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
+import { BROWN, fmt, LATO, LIGHT_BROWN, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
 import { BadgePercent, Check, Tag } from "lucide-react";
 import { useState } from "react";
-import { fmt } from "../cart-page-client";
 
 const COUPONS = [
   { code: "PURE30", desc: "Flat 30% off sitewide", minOrder: 599 },

@@ -51,10 +51,6 @@ export type CartItem = {
   } | null;
 };
 
-// ─── HELPERS ─────────────────────────────────────────────────────
-export const fmt = (n: number) =>
-  "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 0 });
-
 // ─── TOAST NOTIFICATION ──────────────────────────────────────────
 function Toast({ message, onClose }: { message: string; onClose: () => void }) {
   return (
@@ -111,7 +107,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
     useRemoveFromCart(isloggedIn);
   const { mutate: addToCart, isPending: isAdditionPending } =
     useAddToCart(isloggedIn);
-  const { mutate: clearCart, isPending: isClearingCartPending } =
+  const { mutate: clearCart } =
     useClearCart(isloggedIn);
 
   const handleQtyChange = (
@@ -147,10 +143,6 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
     setDiscountPct(pct);
   };
 
-  const handleAddSuggested = (_id: number, name: string) => {
-    showToast(`${name} added to cart!`);
-  };
-
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
@@ -161,7 +153,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
       {productsData?.cartItems.length === 0 ? (
         <EmptyCart />
       ) : (
-        <main className="max-w-6xl mx-auto px-6 py-10">
+        <main className="max-w-6xl mx-auto px-6 py-16">
           {/* Page Title */}
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -252,7 +244,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
               <DeliveryInfo />
 
               {/* Suggested */}
-              <SuggestedProducts onAdd={handleAddSuggested} />
+              <SuggestedProducts isLoggedIn={isloggedIn} />
             </div>
 
             {/* ── RIGHT COLUMN: ORDER SUMMARY ── */}

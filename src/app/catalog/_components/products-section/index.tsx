@@ -4,6 +4,7 @@ import { GetUserProducts } from "@/actions/product";
 import { ProductCard } from "@/components/global/global-product-card";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
+import { categoryFilterSlugType } from "../category-panel";
 
 const ProductsSection = ({ activePath, isLoggedIn }: { activePath: string, isLoggedIn: boolean }) => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -19,7 +20,7 @@ const ProductsSection = ({ activePath, isLoggedIn }: { activePath: string, isLog
 
     queryFn: async ({ pageParam }: { pageParam: string | undefined }) =>
       GetUserProducts({
-        filter: activePath as any,
+        filter: activePath as categoryFilterSlugType,
         cursor: pageParam,
         limit: 12,
       }),

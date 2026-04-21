@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -21,55 +22,16 @@ import {
   ShoppingCart,
   DollarSign,
   Package,
-  ChevronUp,
-  ChevronDown,
   Pencil,
   Trash2,
-  Eye,
   Star,
 } from "lucide-react";
 import { OrderStatusBadge } from "./orders/page";
 import React from "react";
-
-export const GREEN = "#166534";
-export const GREEN_LIGHT = "#16a34a";
-export const GOLD = "#B8960C";
-export const GOLD_LIGHT = "#D4AF37";
-
-const STATS = [
-  {
-    label: "Total Revenue",
-    value: "$48,295",
-    change: "+12.5%",
-    up: true,
-    icon: DollarSign,
-    color: GREEN,
-  },
-  {
-    label: "Total Orders",
-    value: "1,284",
-    change: "+8.2%",
-    up: true,
-    icon: ShoppingCart,
-    color: GOLD,
-  },
-  {
-    label: "Products",
-    value: "342",
-    change: "-2.1%",
-    up: false,
-    icon: Package,
-    color: "#0f766e",
-  },
-  {
-    label: "Customers",
-    value: "5,670",
-    change: "+18.4%",
-    up: true,
-    icon: Users,
-    color: "#1d4ed8",
-  },
-];
+import { BROWN, fmt, ORANGE } from "@/lib/helper";
+import { useQueryData } from "@/hooks/useQueryData";
+import { GetAdminDashboardStats } from "@/actions/admin";
+import { GetAdminDashboardStatsReturnType } from "@/types/admin.types";
 
 export const PRODUCTS = [
   {
@@ -187,9 +149,13 @@ export const ORDERS = [
   },
 ];
 
-const RECENT_ORDERS = ORDERS.slice(0, 5);
-
-export const ActionMenu = ({onEdit, onDelete}: { onEdit: () => void, onDelete: () => void}) => (
+export const ActionMenu = ({
+  onEdit,
+  onDelete,
+}: {
+  onEdit?: () => void;
+  onDelete?: () => void;
+}) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
       <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-green-50">
@@ -197,12 +163,19 @@ export const ActionMenu = ({onEdit, onDelete}: { onEdit: () => void, onDelete: (
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" className="text-sm">
-      <DropdownMenuItem onClick={onEdit} className="gap-2 cursor-pointer">
-        <Pencil size={13} /> Edit
-      </DropdownMenuItem>
-      <DropdownMenuItem onClick={onDelete} className="gap-2 cursor-pointer text-red-500 focus:text-red-500">
-        <Trash2 className="text-red-500!" size={13} /> Delete
-      </DropdownMenuItem>
+      {onEdit && (
+        <DropdownMenuItem onClick={onEdit} className="gap-2 cursor-pointer">
+          <Pencil size={13} /> Edit
+        </DropdownMenuItem>
+      )}
+      {onDelete && (
+        <DropdownMenuItem
+          onClick={onDelete}
+          className="gap-2 cursor-pointer text-red-500 focus:text-red-500"
+        >
+          <Trash2 className="text-red-500!" size={13} /> Delete
+        </DropdownMenuItem>
+      )}
     </DropdownMenuContent>
   </DropdownMenu>
 );
@@ -245,20 +218,28 @@ export const GoldDivider = () => (
     <div
       className="h-px flex-1"
       style={{
-        background: `linear-gradient(to right, transparent, ${GOLD}60)`,
+        background: `linear-gradient(to right, transparent, ${BROWN}60)`,
       }}
     />
-    <svg width="10" height="10" viewBox="0 0 16 16" fill={GOLD}>
+    <svg width="10" height="10" viewBox="0 0 16 16" fill={BROWN}>
       <polygon points="8,0 10,6 16,6 11,10 13,16 8,12 3,16 5,10 0,6 6,6" />
     </svg>
     <div
       className="h-px flex-1"
-      style={{ background: `linear-gradient(to left, transparent, ${GOLD}60)` }}
+      style={{
+        background: `linear-gradient(to left, transparent, ${BROWN}60)`,
+      }}
     />
   </div>
 );
 
 const AdminDashboard = () => {
+  const { data } = useQueryData(["admin-dashboard-stats"], () =>
+    GetAdminDashboardStats(),
+  );
+  const { data: dashboardStats } =
+    data as GetAdminDashboardStatsReturnType;
+
   return (
     <main className="flex-1 overflow-y-auto p-5 lg:p-7">
       <PageHeader
@@ -269,58 +250,134 @@ const AdminDashboard = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        {STATS.map((s) => {
-          const Icon = s.icon;
-          return (
-            <Card
-              key={s.label}
-              className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
-              style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
-            >
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p
-                      className="text-xs uppercase tracking-widest text-gray-400 mb-1"
-                      style={{ fontFamily: "'Lato', sans-serif" }}
-                    >
-                      {s.label}
-                    </p>
-                    <p
-                      className="text-2xl font-light"
-                      style={{
-                        color: "#111",
-                        fontFamily: "'Lato', sans-serif",
-                      }}
-                    >
-                      {s.value}
-                    </p>
-                    <span
-                      className={`inline-flex items-center gap-1 text-xs font-semibold mt-1`}
-                      style={{
-                        color: s.up ? GREEN : "#dc2626",
-                        fontFamily: "'Lato', sans-serif",
-                      }}
-                    >
-                      {s.up ? (
-                        <ChevronUp size={12} />
-                      ) : (
-                        <ChevronDown size={12} />
-                      )}{" "}
-                      {s.change}
-                    </span>
-                  </div>
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ background: `${s.color}15` }}
-                  >
-                    <Icon size={18} style={{ color: s.color }} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        <Card
+          className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
+          style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
+        >
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p
+                  className="text-xs uppercase tracking-widest text-gray-400 mb-1"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  Total Revenue
+                </p>
+                <p
+                  className="text-2xl font-light"
+                  style={{
+                    color: "#111",
+                    fontFamily: "'Lato', sans-serif",
+                  }}
+                >
+                  {fmt(dashboardStats.stats.totalEarnings)}
+                </p>
+              </div>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: `${BROWN}15` }}
+              >
+                <DollarSign size={18} style={{ color: BROWN }} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
+          style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
+        >
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p
+                  className="text-xs uppercase tracking-widest text-gray-400 mb-1"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  Total Orders
+                </p>
+                <p
+                  className="text-2xl font-light"
+                  style={{
+                    color: "#111",
+                    fontFamily: "'Lato', sans-serif",
+                  }}
+                >
+                  {dashboardStats.stats.totalOrders}
+                </p>
+              </div>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: `${BROWN}15` }}
+              >
+                <ShoppingCart size={18} style={{ color: BROWN }} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
+          style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
+        >
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p
+                  className="text-xs uppercase tracking-widest text-gray-400 mb-1"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  Products
+                </p>
+                <p
+                  className="text-2xl font-light"
+                  style={{
+                    color: "#111",
+                    fontFamily: "'Lato', sans-serif",
+                  }}
+                >
+                  {dashboardStats.stats.totalProducts}
+                </p>
+              </div>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: `${BROWN}15` }}
+              >
+                <Package size={18} style={{ color: BROWN }} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          className="border-0 shadow-sm hover:shadow-md transition-shadow duration-200"
+          style={{ outline: "1px solid #f0f0f0", borderRadius: "4px" }}
+        >
+          <CardContent className="p-5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p
+                  className="text-xs uppercase tracking-widest text-gray-400 mb-1"
+                  style={{ fontFamily: "'Lato', sans-serif" }}
+                >
+                  Customers
+                </p>
+                <p
+                  className="text-2xl font-light"
+                  style={{
+                    color: "#111",
+                    fontFamily: "'Lato', sans-serif",
+                  }}
+                >
+                  {dashboardStats.stats.totalCustomers}
+                </p>
+              </div>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ background: `${BROWN}15` }}
+              >
+                <Users size={18} style={{ color: BROWN }} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
@@ -337,16 +394,17 @@ const AdminDashboard = () => {
               >
                 Recent Orders
               </CardTitle>
-              <span
+              <a
+                href="/admin/orders"
                 className="text-xs cursor-pointer hover:opacity-70"
                 style={{
-                  color: GOLD,
+                  color: ORANGE,
                   fontFamily: "'Lato', sans-serif",
-                  borderBottom: `1px solid ${GOLD}50`,
+                  borderBottom: `1px solid ${ORANGE}50`,
                 }}
               >
                 View all
-              </span>
+              </a>
             </div>
             <GoldDivider />
           </CardHeader>
@@ -366,28 +424,31 @@ const AdminDashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {RECENT_ORDERS.map((o) => (
+                {dashboardStats.recentOrders.map((o) => (
                   <TableRow
                     key={o.id}
                     className="border-gray-50 hover:bg-green-50/30 transition-colors"
                   >
                     <TableCell
                       className="font-semibold text-sm py-3"
-                      style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
+                      style={{
+                        color: ORANGE,
+                        fontFamily: "'Lato', sans-serif",
+                      }}
                     >
-                      {o.id}
+                      {o.id.slice(0, 4).toUpperCase()}
                     </TableCell>
                     <TableCell
                       className="text-sm text-gray-600 py-3"
                       style={{ fontFamily: "'Lato', sans-serif" }}
                     >
-                      {o.customer}
+                      {o.customerName}
                     </TableCell>
                     <TableCell
                       className="text-sm font-semibold text-gray-700 py-3"
                       style={{ fontFamily: "'Lato', sans-serif" }}
                     >
-                      {o.amount}
+                      {fmt(o.finalAmount)}
                     </TableCell>
                     <TableCell className="py-3">
                       <OrderStatusBadge status={o.status} />
@@ -412,24 +473,24 @@ const AdminDashboard = () => {
               >
                 Top Products
               </CardTitle>
-              <TrendingUp size={16} style={{ color: GOLD }} />
+              <TrendingUp size={16} style={{ color: ORANGE }} />
             </div>
             <GoldDivider />
           </CardHeader>
           <CardContent className="px-6 pb-5 space-y-4">
-            {PRODUCTS.slice(0, 5).map((p, i) => (
+            {dashboardStats.topProducts.map((p, i) => (
               <div key={p.id} className="flex items-center gap-3">
                 <span
                   className="text-xs font-bold w-5 text-center"
-                  style={{ color: GOLD, fontFamily: "'Lato', sans-serif" }}
+                  style={{ color: BROWN, fontFamily: "'Lato', sans-serif" }}
                 >
                   {i + 1}
                 </span>
                 <div
                   className="w-8 h-8 rounded-sm flex items-center justify-center shrink-0"
-                  style={{ background: `${GREEN}10` }}
+                  style={{ background: `${ORANGE}10` }}
                 >
-                  <Package size={14} style={{ color: GREEN }} />
+                  <Package size={14} style={{ color: BROWN }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
@@ -448,12 +509,12 @@ const AdminDashboard = () => {
                 <div className="text-right">
                   <p
                     className="text-sm font-bold"
-                    style={{ color: GREEN, fontFamily: "'Lato', sans-serif" }}
+                    style={{ color: BROWN, fontFamily: "'Lato', sans-serif" }}
                   >
-                    {p.price}
+                    {fmt(p?.discountPrice || p.price)}
                   </p>
                   <div className="flex items-center gap-0.5 justify-end">
-                    <Star size={10} fill={GOLD} color={GOLD} />
+                    <Star size={10} fill={ORANGE} color={ORANGE} />
                     <span
                       className="text-xs text-gray-400"
                       style={{ fontFamily: "'Lato', sans-serif" }}

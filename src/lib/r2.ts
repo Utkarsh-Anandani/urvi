@@ -23,7 +23,7 @@ export async function uploadFile(file: File, folder: string) {
       fileURL: null,
     };
 
-  //@ts-ignore
+  //@ts-expect-error
   await fetch(presignedURL, {
     method: "PUT",
     headers: {

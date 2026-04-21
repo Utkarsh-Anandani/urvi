@@ -497,7 +497,7 @@ const PersonalInfoTab = ({ profile }: { profile: Profile }) => {
               { value: "FEMALE", label: "Female" },
               { value: "OTHERS", label: "Others" },
             ]}
-            //@ts-ignore
+            //@ts-expect-error
             onSave={(v) => setForm((prev) => ({ ...prev, gender: v }))}
           />
         </div>

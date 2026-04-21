@@ -58,7 +58,7 @@ export async function CreateProduct(body: CreateProductBody) {
         isActive: true,
         categoryId,
         images: {
-          //@ts-ignore
+          //@ts-expect-error
           create: images.map((img) => ({
             url: img.url,
             position: img.position,
@@ -156,7 +156,7 @@ export async function UpdateProduct(body: UpdateProductBody) {
           categoryId,
 
           images: {
-            //@ts-ignore
+            //@ts-expect-error
             create: images.map((img) => ({
               url: img.url,
               position: img.position,
@@ -304,11 +304,12 @@ export async function GetUserProducts({
   limit?: number;
 }): Promise<GetUserProductsResponse> {
   try {
-    let where: any = {
-      isActive: true,
-    };
+    let where = {};
+    //@ts-expect-error
+    where.isActive = true;
 
     if (filter === "under-499") {
+      //@ts-expect-error
       where.OR = [
         { discountPrice: { lte: 499 } },
         {
@@ -318,6 +319,7 @@ export async function GetUserProducts({
     }
 
     if (filter === "under-999") {
+      //@ts-expect-error
       where.OR = [
         { discountPrice: { lte: 999 } },
         {
@@ -337,6 +339,7 @@ export async function GetUserProducts({
     const categoryName = categoryFiltersObject[filter] || null;
 
     if (categoryName) {
+      //@ts-expect-error
       where.category = {
         name: categoryName,
       };

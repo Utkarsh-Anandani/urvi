@@ -11,7 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BROWN, LATO, LIGHT_ORANGE, LIGHTER_BROWN, ORANGE } from "@/lib/helper";
+import { BROWN, LATO, LIGHT_ORANGE, ORANGE } from "@/lib/helper";
 import { Avatar } from "@/components/ui/avatar";
 import SearchBar from "@/components/global/global-searchbar";
 import {
@@ -29,7 +29,7 @@ import Link from "next/link";
 const userOptions = [
   {
     name: "My Profile",
-    href: "/profile",
+    href: "/my-profile",
     icon: <User size={20} />,
   },
   {
@@ -50,8 +50,8 @@ const CategoryOptionsModal = () => {
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger
-            style={{ color: "#fff", fontFamily: LATO }}
-            className="bg-transparent! hover:bg-transparent! focus:bg-transparent! focus-visible:ring-0! focus-visible:outline-0! text-base font-normal transition-colors duration-200 hover:opacity-70 no-underline text-center"
+            style={{ fontFamily: LATO }}
+            className="bg-transparent hover:bg-amber-900! hover:text-white text-amber-900 focus:bg-transparent! focus-visible:ring-0! focus-visible:outline-0! text-base font-semibold transition-colors duration-200 hover:opacity-70 no-underline text-center! rounded-full py-0.5! h-7! opacity-100!"
           >
             Shop By Category
           </NavigationMenuTrigger>
@@ -85,8 +85,8 @@ const UserOptionsModal = () => {
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger
-            style={{ color: "#fff", fontFamily: LATO }}
-            className="bg-transparent! hover:bg-transparent! focus:bg-transparent! focus-visible:ring-0! focus-visible:outline-0! text-base font-normal transition-colors duration-200 hover:opacity-70 no-underline text-center!"
+            style={{ fontFamily: LATO }}
+            className="bg-transparent hover:bg-amber-900! hover:text-white text-amber-900 focus:bg-transparent! focus-visible:ring-0! focus-visible:outline-0! text-base font-semibold transition-colors duration-200 hover:opacity-70 no-underline text-center! rounded-full py-0.5! h-7! opacity-100!"
           >
             For Users
           </NavigationMenuTrigger>
@@ -114,10 +114,6 @@ const UserOptionsModal = () => {
   );
 };
 
-const ConcernOptionsModal = () => {
-  return <div></div>;
-};
-
 const NAV_LINKS = [
   {
     name: "Shop by Category",
@@ -138,16 +134,16 @@ const NAV_LINKS = [
     type: "link",
   },
   {
+    name: "Home",
+    modal: null,
+    href: "/",
+    type: "link",
+  },
+  {
     name: "For Users",
     modal: <UserOptionsModal key={1} />,
     href: null,
     type: "nested_link",
-  },
-  {
-    name: "Shop by concern",
-    modal: <ConcernOptionsModal key={2} />,
-    href: null,
-    type: "link",
   },
 ];
 
@@ -161,16 +157,19 @@ const Navbar = ({ isLoggedIn, name }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
   const { data } = useCart(isLoggedIn);
-  
+
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
   return (
-    <header style={{ boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.06)" : "none" }} className="w-full flex flex-col sticky top-0 z-50">
+    <header
+      style={{ boxShadow: scrolled ? "0 2px 24px rgba(0,0,0,0.06)" : "none" }}
+      className="w-full flex flex-col sticky top-0 z-50"
+    >
       <div
-        className="w-full transition-all duration-300"
+        className="w-full transition-all duration-300 relative"
         style={{
           backgroundImage: `url('/nav-bg.png')`,
           backgroundSize: "cover",
@@ -260,29 +259,36 @@ const Navbar = ({ isLoggedIn, name }: Props) => {
             </button>
           </div>
         </div>
+        <div className={`bg-transparent w-full py-3 absolute -bottom-16`}>
+        <div
+          style={{ backgroundColor: "#fff" }}
+          className="max-w-6xl mx-auto rounded-full grid grid-cols-[repeat(auto-fit,minmax(0px,150px))] items-center justify-center gap-x-5 py-1 shadow-md"
+        >
+          {NAV_LINKS.map((link) => {
+            if (link.type === "link") {
+              return (
+                <Link
+                  key={link.name}
+                  href={link?.href || "#"}
+                  className="text-base transition-colors duration-200 text-amber-900 hover:bg-amber-900 hover:text-white no-underline relative group text-center rounded-full py-0.5 font-semibold"
+                  style={{ fontFamily: LATO }}
+                >
+                  {link.name}
+                </Link>
+              );
+            } else {
+              return (
+                <div
+                  className="flex items-center justify-center"
+                  key={link.name}
+                >
+                  {link.modal}
+                </div>
+              );
+            }
+          })}
+        </div>
       </div>
-      <div
-        style={{
-          backgroundColor: LIGHTER_BROWN,
-        }}
-        className={`w-full grid grid-cols-[repeat(auto-fit,minmax(0px,150px))] items-center justify-center gap-x-5 py-3`}
-      >
-        {NAV_LINKS.map((link) => {
-          if (link.type === "link") {
-            return (
-              <Link
-                key={link.name}
-                href={link?.href || "#"}
-                className="text-base transition-colors duration-200 hover:opacity-70 no-underline relative group text-center"
-                style={{ color: "#fff", fontFamily: LATO }}
-              >
-                {link.name}
-              </Link>
-            );
-          } else {
-            return <div className="flex items-center justify-center" key={link.name}>{link.modal}</div>;
-          }
-        })}
       </div>
     </header>
   );

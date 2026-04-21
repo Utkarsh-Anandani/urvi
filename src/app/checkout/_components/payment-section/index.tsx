@@ -6,7 +6,7 @@ import {
   MarkPaymentFailed,
   VerifyPayment,
 } from "@/actions/order";
-import { fmt } from "@/app/(user)/my-cart/_components/cart-page-client";
+import { fmt } from "@/lib/helper";
 import { Button } from "@/components/ui/button";
 import { useRazorpay } from "@/hooks/useRazorpay";
 import { getBuyNowItem } from "@/lib/buy-now";
@@ -17,7 +17,6 @@ import {
   CreditCard,
   Info,
   Loader2,
-  Lock,
   Shield,
 } from "lucide-react";
 import { useState } from "react";

@@ -1,6 +1,4 @@
 "use server";
-import { Star } from "lucide-react";
-import { LIGHT_ORANGE, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
 import {
   dehydrate,
   HydrationBoundary,

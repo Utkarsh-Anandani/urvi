@@ -25,7 +25,7 @@ type ImageData = {
 
 type Props = {
   productId: string;
-  variantId: string;
+  variantId?: string;
   reviews: Review[];
   reviewCount: number;
   avgRating: number;
@@ -335,9 +335,9 @@ const ReviewsSection = ({
                   </div>
 
                   <div className="flex flex-row items-center gap-2">
-                      {r.media.map((m, i) => <Dialog>
+                      {r.media.map((m, i) => <Dialog key={i}>
                         <DialogTrigger>
-                          <img className="w-14 h-14 rounded-sm" key={i} src={m.url} alt={m.type} />
+                          <img className="w-14 h-14 rounded-sm" src={m.url} alt={m.type} />
                         </DialogTrigger>
                         <DialogContent className="max-w-6xl max-h-screen">
                           <DialogTitle className="text-2xl text-black">Image {i + 1}</DialogTitle>

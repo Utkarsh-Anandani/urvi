@@ -6,6 +6,9 @@ export const generateSlug = (name: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
 
+export const fmt = (n: number) =>
+  "₹" + n.toLocaleString("en-IN", { maximumFractionDigits: 2 });
+
 // Theme
 export const GREEN = "#166534";
 export const GREEN_LIGHT = "#16a34a";

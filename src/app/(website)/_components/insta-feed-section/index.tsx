@@ -1,10 +1,10 @@
 import { GREEN, LATO } from "@/lib/helper";
-import { ImagePlaceholder, SectionLabel, SectionTitle } from "../../page";
+import { ImagePlaceholder, SectionLabel, SectionTitle } from "../helper";
 import { Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const InstagramFeed = () => (
-  <section className="py-20 px-5 lg:px-8" style={{ background: "#fafaf8" }}>
+const InstagramFeed = () => {
+  return( <section className="py-20 px-5 lg:px-8" style={{ background: "#fafaf8" }}>
     <div className="max-w-7xl mx-auto">
       <SectionLabel>Instagram</SectionLabel>
       <SectionTitle>Follow Our <em>Journey</em></SectionTitle>
@@ -40,7 +40,7 @@ const InstagramFeed = () => (
         </Button>
       </div>
     </div>
-  </section>
-);
+  </section>);
+};
 
 export default InstagramFeed;

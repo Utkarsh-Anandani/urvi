@@ -1,21 +1,13 @@
 import { useState } from "react";
 import {
   BROWN,
-  CORMORANT,
   LATO,
   LIGHT_BROWN,
   LIGHTER_ORANGE,
   ORANGE,
 } from "@/lib/helper";
 import {
-  Building2,
-  Edit2,
-  Home,
   Loader,
-  Plus,
-  Save,
-  Trash2,
-  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -29,7 +21,6 @@ import { useQueryData } from "@/hooks/useQueryData";
 import { AddNewAddress, GetAllAddresses } from "@/actions/user";
 import { toast } from "sonner";
 import { useMutationData } from "@/hooks/useMutationData";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const AddressesTab = () => {
   const [mode, setMode] = useState<"saved" | "new">("saved");
@@ -45,7 +36,7 @@ const AddressesTab = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { data, isFetching, isFetched } = useQueryData(["user-addresses"], () =>
+  const { data } = useQueryData(["user-addresses"], () =>
     GetAllAddresses(),
   );
   const { data: addresses } = data as GetAllAddressesReturnType;

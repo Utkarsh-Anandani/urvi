@@ -154,7 +154,7 @@ const SignInForm = () => {
           className="text-sm text-center text-gray-400"
           style={{ fontFamily: "'Lato', sans-serif" }}
         >
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <a
             href="/signup"
             className="font-semibold hover:opacity-70 transition-opacity"

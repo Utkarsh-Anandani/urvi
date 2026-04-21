@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import Footer from "../(website)/_components/footer";
 
 export const metadata: Metadata = {
-  title: "Urvi - Catalog",
+  title: "Catalog | Urvi",
   description: "Buy all organic products online",
 };
 

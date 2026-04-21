@@ -1,5 +1,5 @@
-import { BROWN, LATO, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
-import { CartItem, fmt } from "../cart-page-client";
+import { BROWN, fmt, LATO, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
+import { CartItem } from "../cart-page-client";
 import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

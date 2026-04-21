@@ -11,7 +11,8 @@ export const useMutationData = (
   mutationKey: MutationKey,
   mutationFn: MutationFunction<any, any>,
   queryKey?: string[],
-  onSuccess?: (data: any) => void,
+  //@ts-expect-error
+  onSuccess?: (data) => void,
 ) => {
   const client = useQueryClient();
   const { mutate, isPending } = useMutation({

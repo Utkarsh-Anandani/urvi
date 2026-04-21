@@ -27,7 +27,7 @@ const EmptyCart = () => {
         className="mt-2 text-sm max-w-xs"
         style={{ color: "#9a7a6e", fontFamily: LATO }}
       >
-        Looks like you haven't added anything yet. Explore our pure, natural
+        Looks like you haven&apos;t added anything yet. Explore our pure, natural
         products and fill your cart with goodness.
       </p>
       <Button

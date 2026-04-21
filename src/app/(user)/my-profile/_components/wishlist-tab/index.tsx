@@ -1,4 +1,4 @@
-import { fmt } from "@/app/(user)/my-cart/_components/cart-page-client";
+import { fmt } from "@/lib/helper";
 import { BROWN, CORMORANT, LATO, LIGHTER_ORANGE } from "@/lib/helper";
 import { Heart, Trash2 } from "lucide-react";
 import Image from "next/image";
