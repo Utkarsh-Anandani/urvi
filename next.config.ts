@@ -9,11 +9,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "pub-99291093b65d41efa5b60d58d61a9b8a.r2.dev",
       },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com"
-      }
     ],
+  },
+  outputFileTracingIncludes: {
+    "/api/**/*": ["./src/generated/**/*"],
+    "/*": ["./src/generated/**/*"],
   },
 };
 
