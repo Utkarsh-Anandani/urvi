@@ -1,4 +1,10 @@
+import { GetUsersOrders } from "@/actions/order";
 import { requireAuth } from "@/lib/auth";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
 export default async function UserProfileLayout({
   children,
@@ -6,5 +12,14 @@ export default async function UserProfileLayout({
   children: React.ReactNode;
 }>) {
   await requireAuth();
-  return <>{children}</>;
+  const client = new QueryClient();
+
+  await client.prefetchQuery({
+    queryKey: ["user-orders"],
+    queryFn: () => GetUsersOrders(),
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(client)}>{children}</HydrationBoundary>
+  );
 }

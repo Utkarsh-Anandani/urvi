@@ -2,60 +2,29 @@ import { fmt } from "@/lib/helper";
 import { Badge } from "@/components/ui/badge";
 import { BROWN, CORMORANT, LATO, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
 import { ChevronRight, Clock, Package } from "lucide-react";
-
-export interface OrderHistory {
-  id: string;
-  date: string;
-  items: string[];
-  total: number;
-  status: "delivered" | "shipped" | "processing" | "cancelled";
-}
+import { useQueryData } from "@/hooks/useQueryData";
+import { GetUsersOrders } from "@/actions/order";
+import { GetUsersOrdersReturnType } from "@/types/order.type";
+import { OrderStatus } from "@prisma/client";
 
 const STATUS_META: Record<
-  OrderHistory["status"],
+  OrderStatus,
   { label: string; bg: string; color: string }
 > = {
-  delivered: { label: "Delivered", bg: "#e8f5e9", color: "#2d6a4f" },
-  shipped: { label: "Shipped", bg: "#fff3e0", color: "#e65100" },
-  processing: { label: "Processing", bg: LIGHTER_ORANGE, color: BROWN },
-  cancelled: { label: "Cancelled", bg: "#ffeaea", color: "#c0392b" },
+  DELIVERED: { label: "Delivered", bg: "#e8f5e9", color: "#2d6a4f" },
+  CONFIRMED: { label: "Confirmed", bg: "#e8f5e9", color: "#2d6a4f" },
+  SHIPPED: { label: "Shipped", bg: "#fff3e0", color: "#e65100" },
+  RETURNED: { label: "Returned", bg: "#fff3e0", color: "#e65100" },
+  PENDING: { label: "Processing", bg: LIGHTER_ORANGE, color: BROWN },
+  CANCELLED: { label: "Cancelled", bg: "#ffeaea", color: "#c0392b" },
 };
 
-const ORDER_HISTORY: OrderHistory[] = [
-  {
-    id: "PF87654321",
-    date: "12 Apr 2026",
-    items: ["Groundnut Oil 2L", "A2 Ghee 500ml"],
-    total: 2549,
-    status: "delivered",
-  },
-  {
-    id: "PF76543210",
-    date: "28 Mar 2026",
-    items: ["Coconut Oil 1L", "Mustard Oil 1L"],
-    total: 930,
-    status: "delivered",
-  },
-  {
-    id: "PF65432109",
-    date: "10 Mar 2026",
-    items: ["Groundnut Oil 5L"],
-    total: 2000,
-    status: "delivered",
-  },
-  {
-    id: "PF54321098",
-    date: "20 Feb 2026",
-    items: ["Sesame Oil 500ml", "Khapli Atta 1kg"],
-    total: 670,
-    status: "delivered",
-  },
-];
-
 const OrdersTab = () => {
+  const { data } = useQueryData(["user-orders"], () => GetUsersOrders());
+  const { data: ordersData } = data as GetUsersOrdersReturnType;
   return (
     <div className="flex flex-col gap-3">
-      {ORDER_HISTORY.map((order) => {
+      {ordersData.map((order) => {
         const meta = STATUS_META[order.status];
         return (
           <div
@@ -69,14 +38,14 @@ const OrdersTab = () => {
                   className="font-black text-sm"
                   style={{ color: BROWN, fontFamily: LATO }}
                 >
-                  {order.id}
+                  {order.id.slice(0,4).toUpperCase()}
                 </p>
                 <p
                   className="text-xs mt-0.5 flex items-center gap-1"
                   style={{ color: "#9a7a6e", fontFamily: LATO }}
                 >
                   <Clock size={11} />
-                  {order.date}
+                  {order.createdAt.toDateString()}
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -103,7 +72,9 @@ const OrdersTab = () => {
               className="text-sm"
               style={{ color: "#6b5a52", fontFamily: LATO }}
             >
-              {order.items.join(" · ")}
+              {order.items.map((item, i) => (
+                <>{item.product.name} {item?.variant?.name || ""}{ i !== order.items.length - 1 ? " · " : ""}</>
+              ))}
             </p>
             <div className="flex items-center justify-between mt-3">
               <span
@@ -114,20 +85,20 @@ const OrdersTab = () => {
                   color: BROWN,
                 }}
               >
-                {fmt(order.total)}
+                {fmt(order.finalAmount)}
               </span>
-              <button
+              {/* <button
                 className="text-xs font-bold underline"
                 style={{ color: ORANGE, fontFamily: LATO }}
               >
                 View Details
-              </button>
+              </button> */}
             </div>
           </div>
         );
       })}
 
-      {ORDER_HISTORY.length === 0 && (
+      {(!ordersData || ordersData.length === 0) && (
         <div className="text-center py-16">
           <Package
             size={40}

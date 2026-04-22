@@ -360,3 +360,48 @@ export async function MarkPaymentFailed(razorpay_order_id: string) {
     };
   }
 }
+
+export async function GetUsersOrders() {
+  try {
+    const session = await requireServerAuth();
+    if(!session || !session.id) throw new Error("Unauthorized");
+
+    const orders = await client.order.findMany({
+      where: {
+        userId: session.id
+      },
+      select: {
+        id: true,
+        createdAt: true,
+        status: true,
+        paymentStatus: true,
+        finalAmount: true,
+        items: {
+          select: {
+            product: {
+              select: {
+                name: true
+              }
+            },
+            variant: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    return {
+      status: 200,
+      data: orders
+    }
+  } catch (error) {
+    console.error("Error fetching users orders: ", error);
+    return {
+      status: 500,
+      message: "Error fetching user orders"
+    }
+  }
+}
