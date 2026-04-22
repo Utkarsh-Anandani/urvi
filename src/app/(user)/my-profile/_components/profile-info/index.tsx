@@ -380,7 +380,7 @@ const PersonalInfoTab = ({ profile }: { profile: Profile }) => {
     lastName: profile.lastName || "",
     email: profile.email || "",
     phone: profile.phone || "",
-    dob: profile.dob || "",
+    dob: profile?.dob || new Date(),
     gender: profile.gender || "OTHERS",
     image: profile.image || "",
   });
@@ -397,7 +397,7 @@ const PersonalInfoTab = ({ profile }: { profile: Profile }) => {
       lastName: form.lastName.trim() ? form.lastName : undefined,
       email: form.email,
       phone: form.phone.trim() ? form.phone : undefined,
-      dob: form.dob.trim() ? form.dob : undefined,
+      dob: form.dob ? form.dob.toString() : undefined,
       gender: form.gender.trim() ? form.gender : undefined,
       image: form.image.trim() ? form.image : undefined,
     };
