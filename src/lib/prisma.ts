@@ -10,7 +10,7 @@ const globalForPrisma = globalThis as unknown as {
 
 // Create pool (Vercel Postgres)
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL,
+  connectionString: process.env.DATABASE_URL,
 });
 
 // Attach pool (important for Vercel serverless)
