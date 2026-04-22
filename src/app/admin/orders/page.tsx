@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BROWN, fmt, LIGHT_ORANGE, ORANGE } from "@/lib/helper";
-import { OrderStatus, PaymentStatus } from "@/generated/enums";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
 import { useQueryData } from "@/hooks/useQueryData";
 import { GetAdminOrders, UpdateOrderStatus } from "@/actions/admin";
 import { AdminOrder, GetAdminOrdersReturnType } from "@/types/admin.types";

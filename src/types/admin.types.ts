@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentStatus, Role } from "@/generated/enums";
+import { OrderStatus, PaymentStatus, Role } from "@prisma/client";
 
 export type GetAdminDashboardStatsReturnType = {
   status: number;

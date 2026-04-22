@@ -1,4 +1,4 @@
-import { Gender, Role } from "@/generated/enums";
+import { Gender, Role } from "@prisma/client";
 import { AddNewAddressSchema, UpdateUserProfileSchema } from "@/schema/user.schema";
 import z from "zod";
 

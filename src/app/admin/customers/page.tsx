@@ -13,7 +13,7 @@ import { fmt, ORANGE } from "@/lib/helper";
 import { useQueryData } from "@/hooks/useQueryData";
 import { GetAdminCustomers } from "@/actions/admin";
 import { GetAdminCustomersReturnType } from "@/types/admin.types";
-import { Role } from "@/generated/enums";
+import { Role } from "@prisma/client";
 
 const CustomerStatusBadge = ({ role }: { role: Role }) => {
   const map = {

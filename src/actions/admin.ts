@@ -1,7 +1,7 @@
 "use server";
-import { OrderStatus, PaymentStatus } from "@/generated/enums";
 import { requireRole } from "@/lib/auth";
 import client from "@/lib/prisma";
+import { OrderStatus, PaymentStatus } from "@prisma/client";
 
 export async function GetAdminDashboardStats() {
   try {

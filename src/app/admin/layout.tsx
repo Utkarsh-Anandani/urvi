@@ -14,7 +14,7 @@ import {
   GetAdminDashboardStats,
   GetAdminOrders,
 } from "@/actions/admin";
-import { OrderStatus } from "@/generated/enums";
+import { OrderStatus } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Admin | Urvi",
