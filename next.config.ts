@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
     ],
   },
   outputFileTracingIncludes: {
-    "/api/**/*": ["./src/generated/**/*"],
-    "/*": ["./src/generated/**/*"],
+    "/api/**/*": ["./src/generated/client/**/*"],
+    "/*": ["./src/generated/client/**/*"],
   },
 };
 
