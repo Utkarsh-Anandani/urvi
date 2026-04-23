@@ -11,6 +11,7 @@ import {
   CreateReviewBody,
   GetAdminProductsResponse,
   GetUserProductsResponse,
+  SearchProductsReturnType,
   UpdateProductBody,
 } from "@/types/product.types";
 import { generateSlug } from "@/lib/helper";
@@ -524,6 +525,7 @@ export async function GetUserProductDetails(slug: string) {
 export async function AddReview(body: CreateReviewBody) {
   try {
     const session = await requireServerAuth();
+    if(!session || !session.id) throw new Error("Unauthorized");
 
     const parsed = CreateReviewSchema.safeParse(body);
     if (!parsed.success) {
@@ -532,27 +534,28 @@ export async function AddReview(body: CreateReviewBody) {
 
     const { rating, comment, productId, variantId, media } = parsed.data;
 
-    const result = await client.$transaction(async (tx) => {
-      const product = await tx.product.findUnique({
-        where: {
-          id: productId,
-        },
-        select: {
-          avgRating: true,
-          reviewCount: true,
-        },
-      });
+    const product = await client.product.findUnique({
+      where: { id: productId },
+      select: {
+        avgRating: true,
+        reviewCount: true,
+      },
+    });
 
-      if (!product) throw new Error("Product not found");
+    if (!product) throw new Error("Product not found");
 
-      const oldAvg = product?.avgRating || 0;
-      const oldCount = product?.reviewCount || 0;
+    const oldAvg = product.avgRating || 0;
+    const oldCount = product.reviewCount || 0;
 
-      const review = await tx.review.create({
+    const newCount = oldCount + 1;
+    const newAvg = (oldCount * oldAvg + rating) / newCount;
+
+    const [review] = await client.$transaction([
+      client.review.create({
         data: {
           rating,
           comment,
-          userId: session?.id ? session.id : "",
+          userId: session.id,
           productId,
           variantId,
           media: media
@@ -565,30 +568,21 @@ export async function AddReview(body: CreateReviewBody) {
               }
             : undefined,
         },
-        include: {
-          media: true,
-        },
-      });
+        include: { media: true },
+      }),
 
-      const newCount = oldCount + 1;
-      const newAvg = (oldCount * oldAvg + rating) / newCount;
-
-      await tx.product.update({
-        where: {
-          id: productId,
-        },
+      client.product.update({
+        where: { id: productId },
         data: {
           avgRating: newAvg,
           reviewCount: newCount,
         },
-      });
-
-      return review;
-    });
+      }),
+    ]);
 
     return {
       status: 200,
-      data: result,
+      data: review,
       message: "Review posted successfully",
     };
   } catch (error) {
@@ -596,6 +590,102 @@ export async function AddReview(body: CreateReviewBody) {
     return {
       status: 500,
       message: error,
+    };
+  }
+}
+
+export async function SearchProducts(
+  query: string,
+): Promise<SearchProductsReturnType> {
+  try {
+    if (!query || !query.trim())
+      return {
+        status: 200,
+        data: [],
+      };
+
+    const search = query.trim();
+
+    const products = await client.product.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            variants: {
+              some: {
+                name: {
+                  contains: search,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        name: true,
+        price: true,
+        discountPrice: true,
+        stock: true,
+        avgRating: true,
+        reviewCount: true,
+        slug: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        variants: {
+          select: {
+            name: true,
+          },
+        },
+        images: {
+          orderBy: {
+            position: "asc",
+          },
+          take: 1,
+          select: {
+            url: true,
+          },
+        },
+      },
+    });
+
+    const formatted = products.map((p) => ({
+      name: p.name,
+      slug: p.slug,
+      price: p.price,
+      discountPrice: p.discountPrice,
+      stock: p.stock,
+      avgRating: p.avgRating,
+      reviewCount: p.reviewCount,
+      variants: p.variants,
+      categoryName: p.category?.name || null,
+      image: p?.images[0]?.url || null,
+    }));
+
+    return {
+      status: 200,
+      data: formatted,
+    };
+  } catch (error) {
+    console.error("Error searching products: ", error);
+    return {
+      status: 500,
+      message: "Error searching products.",
     };
   }
 }

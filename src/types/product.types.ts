@@ -81,3 +81,22 @@ export type Product = {
   variants: Variant[];
   reviews?: Review[];
 };
+
+export type SearchProductsReturnType = {
+  status: number;
+  data?: {
+    name: string;
+    slug: string;
+    price: number;
+    discountPrice: number | null;
+    stock: number;
+    avgRating: number;
+    reviewCount: number;
+    variants: {
+      name: string;
+    }[];
+    categoryName: string | null;
+    image: string | null;
+  }[];
+  message?: string;
+};
