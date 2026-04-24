@@ -8,8 +8,7 @@ export const CreateProductSchema = z.object({
 
   description: z
     .string()
-    .min(3, "Description must be at least 3 characters")
-    .max(120, "Description too long"),
+    .min(3, "Description must be at least 3 characters"),
 
   categoryId: z.uuid().optional().nullable(),
 
@@ -38,11 +37,19 @@ export const CreateProductSchema = z.object({
     )
     .min(1, "Atleast one variant must exist"),
 
-  tags: z.array(
-    z
-      .string()
-      .min(1, "Tag must not be empty")
-      .max(8, "Max limit is 8 characters"),
+  tags: z
+    .array(z.string())
+    .min(1, "Tag must not be empty")
+    .max(8, "Max limit is 8 characters"),
+
+  pageSections: z.array(
+    z.object({
+      title: z.string().optional().nullable(),
+      subtitle: z.string().optional().nullable(),
+      type: z.enum(["IMAGE", "VIDEO"]),
+      mediaURL: z.url(),
+      order: z.number().min(0),
+    }),
   ),
 });
 
@@ -58,7 +65,7 @@ export const CreateReviewSchema = z.object({
     .array(
       z.object({
         type: z.enum(["IMAGE", "VIDEO"]),
-        url: z.httpUrl(),
+        url: z.url(),
       }),
     )
     .optional(),
@@ -73,8 +80,7 @@ export const UpdateProductSchema = z.object({
 
   description: z
     .string()
-    .min(3, "Description must be at least 3 characters")
-    .max(120, "Description too long"),
+    .min(3, "Description must be at least 3 characters"),
 
   categoryId: z.uuid().optional().nullable(),
 
@@ -103,10 +109,18 @@ export const UpdateProductSchema = z.object({
     )
     .min(1, "Atleast one variant must exist"),
 
-  tags: z.array(
-    z
-      .string()
-      .min(1, "Tag must not be empty")
-      .max(8, "Max limit is 8 characters"),
+  tags: z
+    .array(z.string())
+    .min(1, "Tag must not be empty")
+    .max(8, "Max limit is 8 characters"),
+
+  pageSections: z.array(
+    z.object({
+      title: z.string().optional().nullable(),
+      subtitle: z.string().optional().nullable(),
+      type: z.enum(["IMAGE", "VIDEO"]),
+      mediaURL: z.url(),
+      order: z.number().min(0),
+    }),
   ),
 });

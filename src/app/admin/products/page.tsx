@@ -1,18 +1,8 @@
 "use client";
 import { useRef, useState } from "react";
-import {
-  ActionMenu,
-  PageHeader,
-} from "../page";
+import { ActionMenu, PageHeader } from "../page";
 import { Button } from "@/components/ui/button";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Loader,
-  Plus,
-  Star,
-  X,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader, Plus, Star, X } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -72,11 +62,29 @@ import {
 } from "@/components/ui/dialog";
 import { TagInput } from "@/components/global/tag-input";
 import { BROWN, fmt, LIGHT_ORANGE, ORANGE } from "@/lib/helper";
+import { MediaType } from "@prisma/client";
+import Image from "next/image";
 
 type ProductStatus = "Active" | "Out of Stock" | "Low Stock" | "Inactive";
 type ImageData = {
   url: string | null;
   position: number;
+};
+
+type PageSection = {
+  id?: string;
+  title?: string | null;
+  subtitle?: string | null;
+  type: MediaType;
+  mediaURL: string;
+  order: number;
+};
+
+type PageSectionInput = {
+  title?: string | null;
+  subtitle?: string | null;
+  type: MediaType;
+  mediaURL: string;
 };
 
 const ProductStatusBadge = ({ status }: { status: ProductStatus }) => {
@@ -114,6 +122,14 @@ const Products = () => {
     discountPrice: "",
     stock: "",
   });
+  const [pageSections, setPageSections] = useState<PageSection[]>([]);
+  const [isPageSectionDialogOpen, setIsPageSectionDialogOpen] = useState(false);
+  const [pageSectionForm, setPageSectionForm] = useState<PageSectionInput>({
+    title: "",
+    subtitle: "",
+    type: "IMAGE",
+    mediaURL: "",
+  });
   const [tags, setTags] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
     null,
@@ -140,6 +156,7 @@ const Products = () => {
         discountPrice: "",
         stock: "",
       });
+      setPageSections([]);
     },
   );
 
@@ -162,6 +179,7 @@ const Products = () => {
         discountPrice: "",
         stock: "",
       });
+      setPageSections([]);
     },
   );
 
@@ -176,10 +194,10 @@ const Products = () => {
   );
   const { data: products } = data as GetAdminProductsResponse;
 
-  const {
-    data: categoryData,
-    isFetching: isFetchingCategories,
-  } = useQueryData(["admin-categories"], () => GetAdminCategories());
+  const { data: categoryData, isFetching: isFetchingCategories } = useQueryData(
+    ["admin-categories"],
+    () => GetAdminCategories(),
+  );
   const { data: categories } = categoryData as GetCategoriesResponse;
 
   const handleFilesUpload = async (files: File[]) => {
@@ -237,6 +255,7 @@ const Products = () => {
           images: imageData,
           variants: variants,
           tags,
+          pageSections: pageSections.map(({ id, ...rest }) => rest),
         };
         addProduct(payload);
       } else {
@@ -248,6 +267,7 @@ const Products = () => {
           images: imageData,
           variants: variants,
           tags,
+          pageSections: pageSections.map(({ id, ...rest }) => rest),
         };
         updateProduct(payload);
       }
@@ -425,7 +445,9 @@ const Products = () => {
                       <SelectGroup>
                         <SelectLabel>Categories</SelectLabel>
                         {categories.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                          <SelectItem key={c.id} value={c.id}>
+                            {c.name}
+                          </SelectItem>
                         ))}
                       </SelectGroup>
                     </SelectContent>
@@ -506,6 +528,75 @@ const Products = () => {
                   ) : (
                     <div className="w-full text-center text-neutral-300 text-sm">
                       No variants added yet
+                    </div>
+                  )}
+                </Field>
+                <Field>
+                  <div className="flex flex-row items-center justify-between">
+                    <Label htmlFor="page-sections">{`Page Sections (${pageSections.length})`}</Label>
+                    <Button
+                      type="button"
+                      onClick={() => setIsPageSectionDialogOpen(true)}
+                      className="gap-2 h-9 text-xs uppercase tracking-wider rounded-sm"
+                      style={{
+                        background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
+                        border: "none",
+                        fontFamily: "'Lato', sans-serif",
+                      }}
+                    >
+                      Add Section
+                    </Button>
+                  </div>
+                  {pageSections.length > 0 ? (
+                    <div
+                      id="page-sections"
+                      className="mt-3 flex flex-col gap-2"
+                    >
+                      {pageSections.map((ps, i) => (
+                        <div
+                          key={i}
+                          onClick={() => {
+                            setPageSectionForm({
+                              title: ps?.title || "",
+                              subtitle: ps?.subtitle || "",
+                              type: ps.type,
+                              mediaURL: ps.mediaURL,
+                            });
+                            setIsPageSectionDialogOpen(true);
+                            setPageSections((prev) =>
+                              prev.filter((x) => x.id !== ps.id)
+                            );
+                          }}
+                          className="flex items-center justify-between border p-2 rounded-md cursor-pointer"
+                        >
+                          <div className="text-sm">
+                            <p className="font-medium">
+                              {ps?.title || "No Title"}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {ps?.subtitle || "No Subtitle"}
+                            </p>
+                          </div>
+
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPageSections((prev) =>
+                                prev.filter((x) => x.id !== ps.id)
+                              );
+                            }}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="w-full text-center text-neutral-300 text-sm">
+                      No sections added yet
                     </div>
                   )}
                 </Field>
@@ -700,6 +791,7 @@ const Products = () => {
                           );
 
                           setVariants(p.variants);
+                          setPageSections(p?.productPageSections ? p.productPageSections : []);
                           setTags(p.tags);
                         }}
                         onDelete={() => {
@@ -798,6 +890,135 @@ const Products = () => {
               disabled={!variantForm.name || !variantForm.price}
             >
               Add Variant
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={isPageSectionDialogOpen}
+        onOpenChange={setIsPageSectionDialogOpen}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add Section</DialogTitle>
+            <DialogDescription>
+              Add page section like Nutrient Info, Label etc.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-3">
+            {pageSectionForm.mediaURL ? (
+              <div className="relative w-full min-h-40 h-auto">
+                <Image
+                  className="object-contain"
+                  src={pageSectionForm.mediaURL}
+                  alt="sec-content"
+                  fill
+                />
+                <Button
+                  onClick={() =>
+                    setPageSectionForm({ ...pageSectionForm, mediaURL: "" })
+                  }
+                  className="h-2 w-2 rounded-full bg-red-50 absolute top-1 right-1"
+                >
+                  <X className="text-red-500" size={12} />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Label htmlFor="sec-content">Content</Label>
+                <FileUpload
+                  id="sec-content"
+                  disabled={isUploading}
+                  variant="compact"
+                  onFilesAdded={async (files: File[]) => {
+                    const file = files[0];
+                    if (
+                      !file.type.startsWith("image/") &&
+                      !file.type.startsWith("video/")
+                    ) {
+                      toast("Invalid file type");
+                      return;
+                    }
+
+                    const fileType: MediaType = file.type.startsWith("image/")
+                      ? "IMAGE"
+                      : "VIDEO";
+                    const data = await handleFilesUpload(files);
+                    if (!data || data.length === 0) {
+                      toast("Error", { description: "Error uploading file" });
+                      return;
+                    }
+                    setPageSectionForm({
+                      ...pageSectionForm,
+                      mediaURL: data[0].url!,
+                      type: fileType,
+                    });
+                  }}
+                />
+              </>
+            )}
+
+            <Label htmlFor="var-name">Title</Label>
+            <Input
+              id="sec-title"
+              placeholder="Section Title"
+              value={pageSectionForm?.title || ""}
+              onChange={(e) =>
+                setPageSectionForm({
+                  ...pageSectionForm,
+                  title: e.target.value,
+                })
+              }
+            />
+
+            <Label htmlFor="var-name">Subtitle</Label>
+            <Input
+              id="sec-subtitle"
+              placeholder="Section Subtitle"
+              value={pageSectionForm?.subtitle || ""}
+              onChange={(e) =>
+                setPageSectionForm({
+                  ...pageSectionForm,
+                  subtitle: e.target.value,
+                })
+              }
+            />
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              onClick={() => {
+                if (!pageSectionForm.mediaURL) {
+                  toast("Error", { description: "content can't be empty" });
+                  return;
+                }
+
+                const section: PageSection = {
+                  id: crypto.randomUUID(),
+                  title: pageSectionForm.title,
+                  subtitle: pageSectionForm.subtitle,
+                  mediaURL: pageSectionForm.mediaURL,
+                  type: pageSectionForm.type,
+                  order: pageSections.length,
+                };
+
+                setPageSections((prev) => [...prev, section]);
+
+                // reset form
+                setPageSectionForm({
+                  title: "",
+                  subtitle: "",
+                  mediaURL: "",
+                  type: "IMAGE",
+                });
+
+                setIsPageSectionDialogOpen(false);
+              }}
+              disabled={!pageSectionForm.mediaURL}
+            >
+              Add Section
             </Button>
           </DialogFooter>
         </DialogContent>

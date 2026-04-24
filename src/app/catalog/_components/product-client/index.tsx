@@ -1,15 +1,15 @@
 "use client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ImageCarousel from "../../_components/image-carousel";
 import ProductInfo from "../../_components/product-info";
 import ReviewsSection from "../../_components/reviews-section";
 import FaqSection from "../../_components/faq-section";
-import { LATO, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
-import ComparisonSection from "../../_components/comparison-section";
+import { LATO, ORANGE } from "@/lib/helper";
 import { useQueryData } from "@/hooks/useQueryData";
 import { GetUserProductDetails } from "@/actions/product";
 import { GetUserProductDetailsResponse, Variant } from "@/types/product.types";
 import { useState } from "react";
+import SectionHeading from "../section-heading";
+import Image from "next/image";
 
 type Props = {
   slug: string;
@@ -17,9 +17,8 @@ type Props = {
 };
 
 const ProductClient = ({ slug, isLoggedIn }: Props) => {
-  const { data } = useQueryData(
-    ["product-detail", slug],
-    () => GetUserProductDetails(slug),
+  const { data } = useQueryData(["product-detail", slug], () =>
+    GetUserProductDetails(slug),
   );
 
   const { data: productDetail } = data as GetUserProductDetailsResponse;
@@ -46,35 +45,47 @@ const ProductClient = ({ slug, isLoggedIn }: Props) => {
         />
       </main>
 
-      <section className="py-16 px-6 max-w-5xl mx-auto">
-        <Tabs defaultValue="comparison">
-          <TabsList
-            className="mb-10 mx-auto flex w-fit rounded-full p-1"
-            style={{ background: LIGHTER_ORANGE }}
-          >
-            {["comparison", "faq"].map((tab) => (
-              <TabsTrigger
-                key={tab}
-                value={tab}
-                className="rounded-full px-7 py-2 text-sm font-bold capitalize data-[state=active]:shadow-sm"
-                style={
-                  {
-                    fontFamily: LATO,
-                    "--tw-ring-color": ORANGE,
-                  } as React.CSSProperties
-                }
-              >
-                {tab === "comparison" ? "Oil Comparison" : "FAQs"}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-          <TabsContent value="comparison">
-            <ComparisonSection />
-          </TabsContent>
-          <TabsContent value="faq">
-            <FaqSection />
-          </TabsContent>
-        </Tabs>
+      <section className="py-16 max-w-6xl mx-auto">
+        {productDetail.productPageSections?.map((section) => (
+          <div key={section.id} className="py-16 w-full">
+            {section?.title && (
+              <SectionHeading>
+                {section.title.split(" ")[0]}{" "}
+                <em style={{ color: ORANGE, fontStyle: "italic" }}>
+                  {section.title.split(" ")[1]}
+                </em>
+              </SectionHeading>
+            )}
+            {section?.subtitle && (
+              <p className="text-center text-gray-500 mt-2">
+                {section.subtitle}
+              </p>
+            )}
+
+            <div className="mt-6">
+              {section.type === "IMAGE" && (
+                <div className="w-6xl mx-auto aspect-video relative">
+                  <Image
+                    src={section.mediaURL}
+                    alt={section.title || "section-image"}
+                    fill
+                    className="object-contain rounded-md"
+                  />
+                </div>
+              )}
+
+              {section.type === "VIDEO" && (
+                <video
+                  src={section.mediaURL}
+                  controls
+                  className="w-full rounded-md"
+                />
+              )}
+            </div>
+          </div>
+        ))}
+
+        <FaqSection />
       </section>
 
       <ReviewsSection

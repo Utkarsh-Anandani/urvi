@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -90,11 +90,12 @@ model Product {
   variants ProductVariant[]
   tags     ProductTag[]
 
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  reviews    Review[]
-  cartItems  CartItem[]
-  orderItems OrderItem[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  reviews             Review[]
+  cartItems           CartItem[]
+  orderItems          OrderItem[]
+  productPageSections ProductPageSection[]
 
   @@index([categoryId])
   @@index([isActive])
@@ -172,6 +173,19 @@ model ProductTag {
   tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([productId, tagId])
+}
+
+model ProductPageSection {
+  id       String  @id @default(uuid())
+  title    String?
+  subtitle String?
+
+  type     MediaType
+  mediaURL String
+  order    Int
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 enum MediaType {

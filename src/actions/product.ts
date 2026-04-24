@@ -24,8 +24,15 @@ export async function CreateProduct(body: CreateProductBody) {
     const parsed = CreateProductSchema.safeParse(body);
     if (!parsed.success) return { status: 400, message: parsed.error.message };
 
-    const { name, description, categoryId, images, variants, tags } =
-      parsed.data;
+    const {
+      name,
+      description,
+      categoryId,
+      images,
+      variants,
+      tags,
+      pageSections,
+    } = parsed.data;
 
     const minPrice =
       variants.length > 0 ? Math.min(...variants.map((v) => v.price)) : 0;
@@ -83,6 +90,15 @@ export async function CreateProduct(body: CreateProductBody) {
             },
           })),
         },
+        productPageSections: {
+          create: pageSections.map((ps) => ({
+            title: ps.title,
+            subtitle: ps.subtitle,
+            type: ps.type,
+            mediaURL: ps.mediaURL,
+            order: ps.order,
+          })),
+        },
       },
     });
 
@@ -113,6 +129,7 @@ export async function UpdateProduct(body: UpdateProductBody) {
       images,
       variants,
       tags,
+      pageSections,
     } = parsed.data;
 
     const minPrice =
@@ -144,6 +161,7 @@ export async function UpdateProduct(body: UpdateProductBody) {
       client.productImage.deleteMany({ where: { productId } }),
       client.productVariant.deleteMany({ where: { productId } }),
       client.productTag.deleteMany({ where: { productId } }),
+      client.productPageSection.deleteMany({ where: { productId } }),
 
       client.product.update({
         where: { id: productId },
@@ -181,6 +199,16 @@ export async function UpdateProduct(body: UpdateProductBody) {
                   create: { name: tagName },
                 },
               },
+            })),
+          },
+
+          productPageSections: {
+            create: pageSections.map((ps) => ({
+              title: ps.title,
+              subtitle: ps.subtitle,
+              type: ps.type,
+              mediaURL: ps.mediaURL,
+              order: ps.order,
             })),
           },
         },
@@ -275,6 +303,20 @@ export async function GetAdminProducts(): Promise<GetAdminProductsResponse> {
                 name: true,
               },
             },
+          },
+        },
+
+        productPageSections: {
+          orderBy: {
+            order: "asc",
+          },
+          select: {
+            id: true,
+            title: true,
+            subtitle: true,
+            type: true,
+            mediaURL: true,
+            order: true,
           },
         },
       },
@@ -499,6 +541,20 @@ export async function GetUserProductDetails(slug: string) {
             },
           },
         },
+
+        productPageSections: {
+          orderBy: {
+            order: "asc"
+          },
+          select: {
+            id: true,
+            title: true,
+            subtitle: true,
+            type: true,
+            mediaURL: true,
+            order: true
+          }
+        }
       },
     });
 
@@ -525,7 +581,7 @@ export async function GetUserProductDetails(slug: string) {
 export async function AddReview(body: CreateReviewBody) {
   try {
     const session = await requireServerAuth();
-    if(!session || !session.id) throw new Error("Unauthorized");
+    if (!session || !session.id) throw new Error("Unauthorized");
 
     const parsed = CreateReviewSchema.safeParse(body);
     if (!parsed.success) {

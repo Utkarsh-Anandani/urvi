@@ -75,8 +75,7 @@ export const ImagePlaceholder = ({
     style={{
       width,
       height,
-      background:
-        `linear-gradient(135deg, #ffffff 0%, ${LIGHTER_ORANGE} 50%, #ffffff 100%)`,
+      background: "#fff",
       border: `1.5px dashed ${BROWN}60`,
       borderRadius: rounded,
       ...style,

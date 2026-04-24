@@ -80,6 +80,15 @@ export type Product = {
   tags: string[];
   variants: Variant[];
   reviews?: Review[];
+
+  productPageSections?: {
+    id: string;
+    type: MediaType;
+    title?: string | null;
+    subtitle?: string | null;
+    mediaURL: string;
+    order: number;
+  }[];
 };
 
 export type SearchProductsReturnType = {
