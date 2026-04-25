@@ -114,7 +114,7 @@ const UserOptionsModal = () => {
   );
 };
 
-const NAV_LINKS = [
+export const NAV_LINKS = [
   {
     name: "Shop by Category",
     modal: <CategoryOptionsModal />,
@@ -139,12 +139,12 @@ const NAV_LINKS = [
     href: "/",
     type: "link",
   },
-  {
-    name: "For Users",
-    modal: <UserOptionsModal key={1} />,
-    href: null,
-    type: "nested_link",
-  },
+  // {
+  //   name: "For Users",
+  //   modal: <UserOptionsModal key={1} />,
+  //   href: null,
+  //   type: "nested_link",
+  // },
 ];
 
 type Props = {

@@ -2,21 +2,68 @@
 import { getSession } from "@/lib/auth";
 import { BROWN, LATO, ORANGE } from "@/lib/helper";
 import Navbar from "./navbar";
+import NewNavbar from "./new-navbar";
 
 const Header = async () => {
   const session = await getSession();
   return (
     <>
       {/* Announcement bar */}
-      <div
+      {/* <div
         className="w-full py-2 text-center text-xs uppercase tracking-[0.2em]"
         style={{ background: BROWN, color: "#fff", fontFamily: LATO }}
       >
         🌿 Free shipping on orders above ₹999 &nbsp;|&nbsp; Use code{" "}
         <span style={{ color: ORANGE, fontWeight: 700 }}>WELCOME20</span>{" "}
         for 20% off
+      </div> */}
+      <div
+        className="w-full overflow-hidden py-2"
+        style={{ background: BROWN, color: "#fff", fontFamily: LATO }}
+      >
+        <div className="marquee">
+          <div className="marquee-content">
+            {/* ORIGINAL */}
+            <span>🌿 Free shipping on orders above ₹999</span>
+            <span>
+              Use code{" "}
+              <span style={{ color: ORANGE, fontWeight: 700 }}>WELCOME20</span>{" "}
+              for 20% off
+            </span>
+            <span>✨ Pure Bilona Ghee | No Preservatives</span>
+
+            {/* DUPLICATE (IMPORTANT) */}
+            <span>🌿 Free shipping on orders above ₹999</span>
+            <span>
+              Use code{" "}
+              <span style={{ color: ORANGE, fontWeight: 700 }}>WELCOME20</span>{" "}
+              for 20% off
+            </span>
+            <span>✨ Pure Bilona Ghee | No Preservatives</span>
+
+            <span>🌿 Free shipping on orders above ₹999</span>
+            <span>
+              Use code{" "}
+              <span style={{ color: ORANGE, fontWeight: 700 }}>WELCOME20</span>{" "}
+              for 20% off
+            </span>
+            <span>✨ Pure Bilona Ghee | No Preservatives</span>
+
+            <span>🌿 Free shipping on orders above ₹999</span>
+            <span>
+              Use code{" "}
+              <span style={{ color: ORANGE, fontWeight: 700 }}>WELCOME20</span>{" "}
+              for 20% off
+            </span>
+            <span>✨ Pure Bilona Ghee | No Preservatives</span>
+          </div>
+        </div>
       </div>
-      <Navbar isLoggedIn={session?.loggedIn || false} name={session?.email || null} />
+      {/* <Navbar isLoggedIn={session?.loggedIn || false} name={session?.email || null} /> */}
+      <NewNavbar
+        isLoggedIn={session?.loggedIn || false}
+        name={session?.email || null}
+      />
     </>
   );
 };

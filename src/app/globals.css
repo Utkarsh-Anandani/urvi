@@ -148,3 +148,28 @@ body {
     @apply font-sans;
   }
 }
+
+.marquee {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+.marquee-content {
+  display: flex;
+  gap: 12rem;
+  white-space: nowrap;
+  width: max-content;
+
+  animation: scroll 60s linear infinite;
+  font-size: 14px;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
