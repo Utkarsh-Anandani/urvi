@@ -20,7 +20,7 @@ const Newsletter = () => {
   return (
     <section
       id="newsletter"
-      className="py-24 px-5 lg:px-8 relative overflow-hidden"
+      className="py-12 md:py-24 px-5 lg:px-8 relative overflow-hidden"
       style={{
         background: "radial-gradient(ellipse at 50% 50%, #f2d9c3 0%, #fff 60%, #fefce8 100%)",
       }}
@@ -55,7 +55,7 @@ const Newsletter = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="h-12 flex-1 rounded-sm border-gray-200 bg-white focus-visible:ring-2 focus-visible:ring-green-700/20 focus-visible:border-green-700 text-sm"
+              className="h-12! flex-1 rounded-sm border-gray-200 bg-white focus-visible:ring-2 focus-visible:ring-green-700/20 focus-visible:border-green-700 text-sm"
               style={{ fontFamily: LATO }}
             />
             <Button

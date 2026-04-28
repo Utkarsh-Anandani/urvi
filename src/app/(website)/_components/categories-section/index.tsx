@@ -31,7 +31,7 @@ const ShopByCategory = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const { data: productsData } = data as GetUserProductsResponse;
 
   return (
-    <section className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-[#fafaf8]">
+    <section className="py-12 md:py-20 px-4 sm:px-6 lg:px-8 bg-[#fafaf8]">
       <div className="max-w-7xl mx-auto">
         <SectionLabel>Shop by Category</SectionLabel>
 

@@ -160,9 +160,7 @@ body {
   gap: 12rem;
   white-space: nowrap;
   width: max-content;
-
   animation: scroll 60s linear infinite;
-  font-size: 14px;
 }
 
 @keyframes scroll {

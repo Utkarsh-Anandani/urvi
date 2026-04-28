@@ -12,7 +12,7 @@ const ARTICLES = [
 ];
 
 const Blog = () => (
-  <section className="py-20 px-5 lg:px-8" style={{ background: "#fff" }}>
+  <section className="py-12 md:py-20 px-5 lg:px-8" style={{ background: "#fff" }}>
     <div className="max-w-7xl mx-auto">
       <SectionLabel>From the Blog</SectionLabel>
       <SectionTitle>Wellness <em>Wisdom</em></SectionTitle>

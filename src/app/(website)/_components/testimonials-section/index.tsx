@@ -48,7 +48,7 @@ const Testimonials = () => {
 
   return (
     <section
-      className="py-24 px-5 lg:px-8 relative overflow-hidden bg-orange-50"
+      className="py-12 md:py-24 px-5 lg:px-8 relative overflow-hidden bg-orange-50"
       // style={{ background: LIGHTER_ORANGE }}
     >
       {/* Decorative background */}
@@ -78,25 +78,24 @@ const Testimonials = () => {
             <Quote
               size={36}
               style={{ color: "#fff" }}
-              className="mb-6"
+              className="mb-4 md:mb-6"
             />
 
             <p
-              className="text-xl md:text-2xl font-light leading-relaxed mb-8 italic"
+              className="text-lg md:text-2xl font-light leading-relaxed mb-8 italic"
               style={{ color: BROWN, fontFamily: CORMORANT }}
             >
               &quot;{t.text}&quot;
             </p>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               {/* Avatar placeholder */}
               <ImagePlaceholder
                 src="/story-1.JPG"
-                width="48px"
-                height="48px"
                 label="Avatar"
                 rounded="50%"
                 style={{ flexShrink: 0 }}
+                className="w-10! md:w-12! h-10! md:h-12!"
               />
               <div>
                 <p
@@ -106,7 +105,7 @@ const Testimonials = () => {
                   {t.name}
                 </p>
                 <p
-                  className="text-xs opacity-60 mt-0.5"
+                  className="text-xs opacity-60 mt-px md:mt-0.5"
                   style={{ color: BROWN, fontFamily: LATO }}
                 >
                   {t.location}
@@ -114,13 +113,13 @@ const Testimonials = () => {
               </div>
               <div className="ml-auto">
                 <p
-                  className="text-xs uppercase tracking-wider opacity-60"
+                  className="text-[10px] md:text-xs uppercase tracking-wider opacity-60"
                   style={{ color: BROWN, fontFamily: LATO }}
                 >
                   Purchased:
                 </p>
                 <p
-                  className="text-xs font-semibold"
+                  className="text-[10px] md:text-xs font-semibold"
                   style={{ color: BROWN, fontFamily: LATO }}
                 >
                   {t.product}

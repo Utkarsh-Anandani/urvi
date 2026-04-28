@@ -1,7 +1,7 @@
 "use server";
 import { getSession } from "@/lib/auth";
 import { BROWN, LATO, ORANGE } from "@/lib/helper";
-import Navbar from "./navbar";
+// import Navbar from "./navbar";
 import NewNavbar from "./new-navbar";
 
 const Header = async () => {
@@ -9,16 +9,8 @@ const Header = async () => {
   return (
     <>
       {/* Announcement bar */}
-      {/* <div
-        className="w-full py-2 text-center text-xs uppercase tracking-[0.2em]"
-        style={{ background: BROWN, color: "#fff", fontFamily: LATO }}
-      >
-        🌿 Free shipping on orders above ₹999 &nbsp;|&nbsp; Use code{" "}
-        <span style={{ color: ORANGE, fontWeight: 700 }}>WELCOME20</span>{" "}
-        for 20% off
-      </div> */}
       <div
-        className="w-full overflow-hidden py-2"
+        className="w-full overflow-hidden py-2 text-xs md:text-sm"
         style={{ background: BROWN, color: "#fff", fontFamily: LATO }}
       >
         <div className="marquee">

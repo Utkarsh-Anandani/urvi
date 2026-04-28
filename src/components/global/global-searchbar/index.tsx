@@ -139,10 +139,10 @@ const SearchBar = () => {
       {isOpen && (
         <div
           tabIndex={0}
-          className="absolute top-full mt-2 w-80 sm:w-160 bg-white border rounded-xl shadow-xl z-50 p-4 search-container"
+          className="absolute top-full mt-2 w-80 sm:w-160 bg-white border rounded-xl shadow-xl z-50 p-2 sm:p-4 search-container"
         >
-          <div className="mb-4">
-            <h3 className="font-semibold mb-2" style={{ color: BROWN }}>
+          <div className="mb-2 md:mb-4">
+            <h3 className="text-sm md:text-base font-semibold mb-2" style={{ color: BROWN }}>
               Trending Searches
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -150,7 +150,7 @@ const SearchBar = () => {
                 <button
                   key={item}
                   onClick={() => setInputValue(item)}
-                  className="px-3 py-1 rounded-full text-xs border flex gap-2 items-center"
+                  className="px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs border flex gap-2 items-center"
                   style={{ borderColor: BROWN, color: BROWN }}
                 >
                   <TrendingUp size={12} />
@@ -160,11 +160,11 @@ const SearchBar = () => {
             </div>
           </div>
 
-          <h3 className="font-semibold mb-2" style={{ color: BROWN }}>
+          <h3 className="text-sm md:text-base font-semibold mb-2" style={{ color: BROWN }}>
             Products
           </h3>
           {loading || !inputValue.trim() ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="flex gap-3">
                   <Skeleton className="w-16 h-16 rounded-md" />

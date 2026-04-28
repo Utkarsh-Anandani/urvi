@@ -11,7 +11,7 @@ const Benefits = () => {
   ];
 
   return (
-    <section className="py-20 px-5 lg:px-8" style={{ background: "#fff" }}>
+    <section className="py-12 md:py-20 px-5 lg:px-8" style={{ background: "#fff" }}>
       <div className="max-w-7xl mx-auto">
         <SectionLabel>Why Urvi</SectionLabel>
         <SectionTitle>The <em>Difference</em> You&apos;ll Feel</SectionTitle>

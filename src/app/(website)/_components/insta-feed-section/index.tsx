@@ -4,7 +4,7 @@ import { Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const InstagramFeed = () => {
-  return( <section className="py-20 px-5 lg:px-8" style={{ background: "#fafaf8" }}>
+  return( <section className="py-12 md:py-20 px-5 lg:px-8" style={{ background: "#fafaf8" }}>
     <div className="max-w-7xl mx-auto">
       <SectionLabel>Instagram</SectionLabel>
       <SectionTitle>Follow Our <em>Journey</em></SectionTitle>
