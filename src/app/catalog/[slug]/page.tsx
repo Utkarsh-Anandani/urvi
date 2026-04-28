@@ -31,7 +31,7 @@ const page = async ({ params }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(client)}>
-      <div className="w-full max-w-screen h-full flex flex-col gap-5 py-16">
+      <div className="w-full px-3 lg:px-0 max-w-screen h-full flex flex-col gap-5">
         <CategoryPanel activePath={slug} />
         {/* <PageHeader slug={slug} /> */}
         <ProductsSection isLoggedIn={session.loggedIn} activePath={slug} />

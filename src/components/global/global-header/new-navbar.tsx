@@ -71,14 +71,14 @@ const Navbar = ({ isLoggedIn, name }: Props) => {
           </Link>
 
           {/* 🔹 Search */}
-          <div className="hidden sm:block flex-1 max-w-xs md:max-w-sm">
+          <div className="hidden xl:block flex-1 max-w-xs md:max-w-sm">
             <SearchBar />
           </div>
         </div>
 
         <div className="flex flex-row items-center gap-20!">
           {/* 🔹 Nav Links (Scrollable) */}
-          <NavigationMenu className="hidden lg:flex">
+          <NavigationMenu className="hidden xl:flex">
             <NavigationMenuList className="flex gap-3 items-center">
               {NAV_LINKS.map((link) => {
                 if (link.type === "link") {
@@ -156,7 +156,7 @@ const Navbar = ({ isLoggedIn, name }: Props) => {
             ) : (
               <Button
                 onClick={() => router.push("/signin")}
-                className="hidden md:flex gap-2 h-9 text-xs font-bold uppercase tracking-wider rounded-sm"
+                className="flex gap-2 h-9 text-xs font-bold uppercase tracking-wider rounded-sm"
                 style={{
                   background: `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`,
                   border: "none",
@@ -171,7 +171,7 @@ const Navbar = ({ isLoggedIn, name }: Props) => {
 
             {/* Mobile menu */}
             <button
-              className="md:hidden"
+              className="xl:hidden"
               onClick={() => setMenuOpen(!menuOpen)}
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -180,7 +180,7 @@ const Navbar = ({ isLoggedIn, name }: Props) => {
         </div>
       </div>
       <div
-        className={`md:hidden w-full bg-white border-t shadow-md transition-all duration-300 ease-in-out transform ${
+        className={`xl:hidden w-full bg-white border-t shadow-md transition-all duration-300 ease-in-out transform ${
           menuOpen
             ? "max-h-screen opacity-100 translate-y-0 py-4 px-4 border-t"
             : "max-h-0 opacity-0 -translate-y-4 py-0 px-0 border-t-0 pointer-events-none"

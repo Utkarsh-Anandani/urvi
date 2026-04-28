@@ -59,7 +59,7 @@ const ProductsSection = ({ activePath, isLoggedIn }: { activePath: string, isLog
   return (
     <div className="max-w-screen!">
       {/* 🔹 Products Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-3">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-3">
         {data?.pages
           .flatMap((page) => page.data)
           .map((product) => (

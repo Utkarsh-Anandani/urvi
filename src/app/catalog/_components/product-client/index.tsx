@@ -31,11 +31,13 @@ const ProductClient = ({ slug, isLoggedIn }: Props) => {
       style={{ fontFamily: LATO, background: "#fff", color: "#2a1a10" }}
       className="min-h-screen"
     >
-      <main className="max-w-6xl mx-auto px-6 py-18 grid grid-cols-2 gap-12 items-start">
+      <main className="max-w-6xl mx-auto px-3 py-3 lg:py-6 md:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+        <div className="hidden lg:block">
         <ImageCarousel
           category={productDetail.category?.name || null}
           images={productDetail?.images || []}
         />
+        </div>
         <ProductInfo
           product={productDetail}
           selectedVariant={selectedVariant}
@@ -45,9 +47,9 @@ const ProductClient = ({ slug, isLoggedIn }: Props) => {
         />
       </main>
 
-      <section className="py-16 max-w-6xl mx-auto">
+      <section className="py-2 lg:py-6 max-w-6xl mx-auto">
         {productDetail.productPageSections?.map((section) => (
-          <div key={section.id} className="py-16 w-full">
+          <div key={section.id} className="py-2 lg:py-6 w-full">
             {section?.title && (
               <SectionHeading>
                 {section.title.split(" ")[0]}{" "}
@@ -56,15 +58,15 @@ const ProductClient = ({ slug, isLoggedIn }: Props) => {
                 </em>
               </SectionHeading>
             )}
-            {section?.subtitle && (
+            {/* {section?.subtitle && (
               <p className="text-center text-gray-500 mt-2">
                 {section.subtitle}
               </p>
-            )}
+            )} */}
 
             <div className="mt-6">
               {section.type === "IMAGE" && (
-                <div className="w-6xl mx-auto aspect-video relative">
+                <div className="w-screen max-w-6xl mx-auto aspect-video relative">
                   <Image
                     src={section.mediaURL}
                     alt={section.title || "section-image"}

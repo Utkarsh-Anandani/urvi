@@ -32,7 +32,7 @@ const FaqSection = () => {
         Frequently{" "}
         <em style={{ color: ORANGE, fontStyle: "italic" }}>Asked Questions</em>
       </SectionHeading>
-      <Accordion type="single" collapsible className="flex flex-col gap-3">
+      <Accordion type="single" collapsible className="flex flex-col gap-3 mt-6">
         {FAQS.map((faq, i) => (
           <AccordionItem
             key={i}

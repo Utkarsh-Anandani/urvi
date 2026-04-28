@@ -28,7 +28,7 @@ const ImageCarousel = ({ images, category }: Props) => {
   };
 
   return (
-    <div className="sticky top-20 flex flex-col gap-3">
+    <div className="relative lg:sticky lg:top-20 flex flex-col gap-3">
       {/* Main image */}
       <div
         className="relative w-full rounded-2xl overflow-hidden border"

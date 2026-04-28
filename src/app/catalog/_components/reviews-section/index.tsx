@@ -153,7 +153,7 @@ const ReviewsSection = ({
 
   return (
     <section
-      className="py-16 px-6"
+      className="py-6 md:py-16 px-3 md:px-6"
       style={{
         background: "#fdfaf7",
         borderTop: "1px solid #f0e6dc",
@@ -167,10 +167,10 @@ const ReviewsSection = ({
           <em style={{ color: ORANGE, fontStyle: "italic" }}>Customers Say</em>
         </SectionHeading>
 
-        <div className="grid grid-cols-[260px_1fr] gap-10 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-5 lg:gap-10 items-start">
           {/* Summary */}
           <div
-            className="sticky top-20 rounded-2xl p-6 text-center"
+            className="relative md:sticky md:top-20 rounded-2xl p-6 text-center"
             style={{ background: "#fff", border: `1px solid #f0e6dc` }}
           >
             <span

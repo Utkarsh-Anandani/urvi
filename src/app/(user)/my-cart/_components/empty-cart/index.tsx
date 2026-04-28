@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 const EmptyCart = () => {
   const router = useRouter();
   return (
-    <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
+    <div className="w-full min-h-screen flex flex-col items-center justify-center py-24 px-6 text-center">
       <div
         className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
         style={{ background: LIGHTER_ORANGE }}

@@ -9,7 +9,7 @@ const SectionHeading = ({
 }) => {
   return (
     <h2
-      className={`text-center mb-10 ${className}`}
+      className={`text-center mb-2 lg:mb-6 ${className}`}
       style={{
         fontFamily: CORMORANT,
         fontSize: "clamp(28px, 4vw, 42px)",

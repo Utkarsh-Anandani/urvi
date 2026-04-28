@@ -24,6 +24,7 @@ import { StarRating } from "../star-rating";
 import { setBuyNowItem } from "@/lib/buy-now";
 import { useRouter } from "next/navigation";
 import { LocalCartItem } from "@/lib/cart";
+import ImageCarousel from "../image-carousel";
 
 type Props = {
   product: Product;
@@ -76,7 +77,7 @@ const ProductInfo = ({
         {product?.tags.length > 0 && (
           <Badge
             variant="outline"
-            className="mb-3 text-xs font-bold tracking-widest uppercase"
+            className="mb-3 text-[10px] lg:text-xs font-bold tracking-widest uppercase"
             style={{
               borderColor: LIGHTER_ORANGE,
               background: LIGHTER_ORANGE,
@@ -121,21 +122,16 @@ const ProductInfo = ({
         >
           {product.reviewCount} reviews
         </span>
-        {/* <Badge
-          variant="secondary"
-          className="text-xs"
-          style={{
-            background: "#e8f5e9",
-            color: "#2d6a4f",
-            fontFamily: LATO,
-            fontWeight: 700,
-          }}
-        >
-          ✔ 888 happy customers
-        </Badge> */}
       </div>
 
       <Separator style={{ background: "#f0e6dc" }} />
+
+      <div className="block lg:hidden">
+        <ImageCarousel
+          category={product.category?.name || null}
+          images={product?.images || []}
+        />
+      </div>
 
       {/* Price */}
       <div className="flex flex-col gap-2">
@@ -209,7 +205,7 @@ const ProductInfo = ({
           >
             Select Variant
           </p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             {product.variants.map((v, i) => (
               <TooltipProvider key={i}>
                 <Tooltip>
@@ -241,20 +237,6 @@ const ProductInfo = ({
                           Selected
                         </span>
                       )}
-                      {/* {i !== selectedVariant && (
-                      <span
-                        className="absolute -top-2 left-1/2 -translate-x-1/2 text-xs font-bold px-2 py-0.5 rounded-full"
-                        style={{
-                          background: BROWN,
-                          color: "#fff",
-                          fontFamily: LATO,
-                          fontSize: "10px",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        Best Value
-                      </span>
-                    )} */}
                       <div
                         className="font-bold text-sm"
                         style={{ color: BROWN, fontFamily: LATO }}
@@ -321,7 +303,7 @@ const ProductInfo = ({
           disabled={isAddToCartPending}
           onClick={handleAddToCart}
           variant="outline"
-          className="flex-1 h-12 font-bold text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
+          className="hidden md:flex flex-1 h-12 font-bold text-xs md:text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
           style={{
             borderColor: BROWN,
             color: BROWN,
@@ -333,7 +315,7 @@ const ProductInfo = ({
             <Loader size={16} className="animate-spin" />
           ) : (
             <>
-              <ShoppingCart size={16} className="mr-2" />
+              <ShoppingCart size={16} className="mr-1 md:mr-2" />
               Add to Cart
             </>
           )}
@@ -341,7 +323,7 @@ const ProductInfo = ({
 
         <Button
           onClick={handleBuyNow}
-          className="flex-1 h-12 font-bold text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
+          className="hidden md:flex flex-1 h-12 font-bold text-xs md:text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
           style={{
             background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 100%)`,
             color: "#fff",
@@ -350,7 +332,46 @@ const ProductInfo = ({
             border: "none",
           }}
         >
-          <Zap size={16} className="mr-2" />
+          <Zap size={16} className="mr-1 md:mr-2" />
+          Buy Now
+        </Button>
+      </div>
+
+      <div className="flex md:hidden flex-col items-center gap-2">
+        <Button
+          disabled={isAddToCartPending}
+          onClick={handleAddToCart}
+          variant="outline"
+          className="w-full flex-1 py-5 font-bold text-xs md:text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
+          style={{
+            borderColor: BROWN,
+            color: BROWN,
+            fontFamily: LATO,
+            borderWidth: 2,
+          }}
+        >
+          {isAddToCartPending ? (
+            <Loader size={16} className="animate-spin" />
+          ) : (
+            <>
+              <ShoppingCart size={16} className="mr-1 md:mr-2" />
+              Add to Cart
+            </>
+          )}
+        </Button>
+
+        <Button
+          onClick={handleBuyNow}
+          className="w-full flex-1 py-5 font-bold text-xs md:text-sm tracking-wide uppercase transition-all hover:scale-[1.01]"
+          style={{
+            background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 100%)`,
+            color: "#fff",
+            fontFamily: LATO,
+            boxShadow: `0 8px 24px rgba(85,19,5,0.3)`,
+            border: "none",
+          }}
+        >
+          <Zap size={16} className="mr-1 md:mr-2" />
           Buy Now
         </Button>
       </div>
@@ -388,6 +409,12 @@ const ProductInfo = ({
           border: `1px solid #f0e6dc`,
         }}
       >
+        <p
+          className="text-base font-semibold leading-7"
+          style={{ color: "#4a2a18", fontFamily: LATO }}
+        >
+          About Product
+        </p>
         <p
           className="text-sm leading-7"
           style={{ color: "#4a2a18", fontFamily: LATO }}

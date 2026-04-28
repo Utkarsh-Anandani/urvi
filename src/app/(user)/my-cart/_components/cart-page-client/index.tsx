@@ -107,8 +107,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
     useRemoveFromCart(isloggedIn);
   const { mutate: addToCart, isPending: isAdditionPending } =
     useAddToCart(isloggedIn);
-  const { mutate: clearCart } =
-    useClearCart(isloggedIn);
+  const { mutate: clearCart } = useClearCart(isloggedIn);
 
   const handleQtyChange = (
     productId: string,
@@ -128,7 +127,11 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
     }
   };
 
-  const handleRemove = (productId: string, variantId: string | undefined, quantity: number) => {
+  const handleRemove = (
+    productId: string,
+    variantId: string | undefined,
+    quantity: number,
+  ) => {
     const cartItem: LocalCartItem = {
       productId,
       variantId,
@@ -143,17 +146,12 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
     setDiscountPct(pct);
   };
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  };
-
   return (
     <>
       {productsData?.cartItems.length === 0 ? (
         <EmptyCart />
       ) : (
-        <main className="max-w-6xl mx-auto px-6 py-16">
+        <main className="max-w-2xl xl:max-w-6xl mx-auto px-3 md:px-6 py-3 md:py-6">
           {/* Page Title */}
           <div className="flex items-center justify-between mb-8">
             <div>
@@ -182,7 +180,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
               </p>
             </div>
             <button
-              onClick={() => router.push('/catalog/all-products')}
+              onClick={() => router.push("/catalog/all-products")}
               className="hidden md:flex items-center gap-2 text-sm font-bold transition-colors hover:underline"
               style={{ color: LIGHT_BROWN, fontFamily: LATO }}
             >
@@ -191,7 +189,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
             </button>
           </div>
 
-          <div className="grid grid-cols-[1fr_380px] gap-8 items-start">
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-8 items-start">
             {/* ── LEFT COLUMN ── */}
             <div className="flex flex-col gap-4">
               {/* Cart Items */}
@@ -223,7 +221,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
                   </button>
                 </div>
 
-                <div className="p-4 flex flex-col gap-3">
+                <div className="p-2 md:p-4 flex flex-col gap-3">
                   {productsData?.cartItems.map((item, index) => (
                     <CartItemCard
                       key={index}
@@ -240,6 +238,17 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
               {/* Coupon */}
               <CouponSection onApply={handleCoupon} applied={couponCode} />
 
+              {/* Order Summary */}
+              <div className="block xl:hidden">
+                <OrderSummary
+                  couponCode={couponCode}
+                  discountPct={discountPct}
+                  originalTotal={productsData?.netPriceTotal || 0}
+                  discountTotal={productsData?.netDiscountPriceTotal || 0}
+                  totalItems={productsData?.totalQuantity || 0}
+                />
+              </div>
+
               {/* Delivery Info */}
               <DeliveryInfo />
 
@@ -248,7 +257,7 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
             </div>
 
             {/* ── RIGHT COLUMN: ORDER SUMMARY ── */}
-            <div className="sticky top-40 flex flex-col gap-4">
+            <div className="sticky top-20 hidden xl:flex flex-col gap-4">
               <OrderSummary
                 couponCode={couponCode}
                 discountPct={discountPct}
