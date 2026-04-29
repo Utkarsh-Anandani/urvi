@@ -24,6 +24,7 @@ const OrdersTab = () => {
   const { data: ordersData } = data as GetUsersOrdersReturnType;
   return (
     <div className="flex flex-col gap-3">
+      <h1 className="block md:hidden text-lg font-bold">Orders</h1>
       {ordersData.map((order) => {
         const meta = STATUS_META[order.status];
         return (

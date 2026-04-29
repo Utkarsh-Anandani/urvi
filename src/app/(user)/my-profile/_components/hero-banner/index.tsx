@@ -24,7 +24,6 @@ const HeroBanner = ({ image, fullName, email, createdAt, coins }: Props) => {
       className="relative overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 60%, #8b4513 100%)`,
-        minHeight: 160,
       }}
     >
       {/* Decorative circles */}
@@ -41,10 +40,10 @@ const HeroBanner = ({ image, fullName, email, createdAt, coins }: Props) => {
         style={{ background: LIGHTER_ORANGE }}
       />
 
-      <div className="max-w-6xl mx-auto px-8 py-8 flex items-center gap-8 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 lg:px-8 py-6 lg:py-8 flex items-center gap-4 lg:gap-8 relative z-10">
         {/* Avatar in banner */}
         <div
-          className="w-28 h-28 rounded-full overflow-hidden shrink-0"
+          className="w-16 lg:w-28 h-16 lg:h-28 rounded-full overflow-hidden shrink-0"
           style={{
             border: `4px solid rgba(255,255,255,0.9)`,
             boxShadow: `0 8px 32px rgba(0,0,0,0.25)`,
@@ -57,7 +56,7 @@ const HeroBanner = ({ image, fullName, email, createdAt, coins }: Props) => {
               alt={fullName}
               width={112}
               height={112}
-              className="object-cover w-28 h-28"
+              className="object-cover w-16 lg:w-28 h-16 lg:h-28"
             />
           ) : (
             <div
@@ -80,11 +79,11 @@ const HeroBanner = ({ image, fullName, email, createdAt, coins }: Props) => {
           )}
         </div>
 
-        <div className="pb-2">
+        <div className="pb-0 lg:pb-2 flex flex-col justify-center">
           <h1
+            className="text-lg md:text-2xl"
             style={{
               fontFamily: CORMORANT,
-              fontSize: "clamp(24px,3vw,34px)",
               fontWeight: 700,
               color: "#fff",
               lineHeight: 1.1,
@@ -93,7 +92,7 @@ const HeroBanner = ({ image, fullName, email, createdAt, coins }: Props) => {
             {fullName}
           </h1>
           <p
-            className="text-sm mt-1"
+            className="text-xs md:text-sm mt-1"
             style={{ color: "rgba(255,255,255,0.65)", fontFamily: LATO }}
           >
             {email} · Member since {createdAt}

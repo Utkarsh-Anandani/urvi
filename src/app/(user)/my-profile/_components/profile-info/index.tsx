@@ -281,7 +281,7 @@ function AvatarUploader({
       >
         {/* Animated outer ring */}
         <div
-          className="w-36 h-36 rounded-full p-1 transition-all"
+          className="w-28 md:w-36 h-28 md:h-36 rounded-full p-1 transition-all"
           style={{
             background: dragging
               ? `linear-gradient(135deg, ${ORANGE}, ${LIGHT_ORANGE})`
@@ -482,7 +482,7 @@ const PersonalInfoTab = ({ profile }: { profile: Profile }) => {
 
         <EditableField
           label="Date of Birth"
-          value={format(new Date(form.dob), "PPP")}
+          value={form.dob.toString()}
           type="date"
           icon={<Calendar size={14} />}
           onSave={(v) => setForm((prev) => ({ ...prev, dob: v }))}
