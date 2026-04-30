@@ -74,7 +74,7 @@ const OrdersTab = () => {
               style={{ color: "#6b5a52", fontFamily: LATO }}
             >
               {order.items.map((item, i) => (
-                <>{item.product.name} {item?.variant?.name || ""}{ i !== order.items.length - 1 ? " · " : ""}</>
+                <div className="text-sm" style={{ color: "#6b5a52", fontFamily: LATO }} key={i}>{item.product.name} {item?.variant?.name || ""}{ i !== order.items.length - 1 ? " · " : ""}</div>
               ))}
             </p>
             <div className="flex items-center justify-between mt-3">

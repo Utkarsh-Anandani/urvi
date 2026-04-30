@@ -28,9 +28,9 @@ const OrderConfirmed = () => {
       </div>
 
       <h1
+        className="text-3xl md:text-5xl"
         style={{
           fontFamily: CORMORANT,
-          fontSize: 44,
           fontWeight: 700,
           color: BROWN,
           lineHeight: 1.1,
@@ -39,7 +39,7 @@ const OrderConfirmed = () => {
         Order <em style={{ color: ORANGE }}>Confirmed!</em>
       </h1>
       <p
-        className="mt-3 text-sm leading-6"
+        className="mt-3 text-xs md:text-sm leading-6"
         style={{ color: "#9a7a6e", fontFamily: LATO }}
       >
         Thank you for choosing PuraFarm. Your order has been placed successfully
@@ -81,10 +81,10 @@ const OrderConfirmed = () => {
       </div> */}
 
       {/* CTAs */}
-      <div className="flex gap-3 mt-6">
+      <div className="flex flex-col md:flex-row gap-3 mt-6">
         <Button
           onClick={() => router.push("/my-profile")}
-          className="flex-1 h-12 font-bold text-sm uppercase tracking-wide"
+          className="flex-1 py-5 px-5 w-full font-bold text-sm uppercase tracking-wide"
           style={{
             background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 100%)`,
             color: "#fff",
@@ -99,7 +99,7 @@ const OrderConfirmed = () => {
         <Button
           onClick={() => router.push("/catalog/all-products")}
           variant="outline"
-          className="flex-1 h-12 font-bold text-sm uppercase tracking-wide"
+          className="flex-1 py-5 px-5 w-full font-bold text-sm uppercase tracking-wide"
           style={{
             borderColor: "#f0e6dc",
             color: "#9a7a6e",

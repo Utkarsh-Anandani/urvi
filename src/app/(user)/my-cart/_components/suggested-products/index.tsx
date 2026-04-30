@@ -33,7 +33,7 @@ const SuggestedProducts = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
-        {suggestedProducts.map((p) => (
+        {suggestedProducts.slice(0, 2).map((p) => (
           <ProductCard key={p.id} product={p} isLoggedIn={isLoggedIn} />
         ))}
       </div>

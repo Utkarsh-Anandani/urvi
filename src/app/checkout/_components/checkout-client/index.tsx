@@ -70,9 +70,9 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
       {confirmed ? (
         <OrderConfirmed />
       ) : (
-        <main className="max-w-6xl mx-auto px-6 py-10">
+        <main className="max-w-6xl mx-auto px-3 md:px-6 py-5 md:py-10">
           {/* Page Title */}
-          <div className="mb-8">
+          <div className="mb-4 md:mb-8">
             <h1
               style={{
                 fontFamily: CORMORANT,
@@ -94,7 +94,7 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
 
           {/* <StepIndicator current={step} /> */}
 
-          <div className="grid grid-cols-[1fr_380px] gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
             {/* ── LEFT: STEPS ── */}
             <div className="flex flex-col gap-4 animate-in">
               {/* ADDRESS */}

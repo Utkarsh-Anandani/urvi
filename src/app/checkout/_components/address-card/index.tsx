@@ -207,7 +207,7 @@ const AddressSection = ({
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Name */}
             <div>
               <Label
@@ -274,7 +274,7 @@ const AddressSection = ({
               )}
             </div>
             {/* Line 1 */}
-            <div className="col-span-2">
+            <div className="md:col-span-2">
               <Label
                 className="text-xs font-bold uppercase tracking-wide mb-1.5 block"
                 style={{ color: BROWN, fontFamily: LATO }}
@@ -297,7 +297,7 @@ const AddressSection = ({
               )}
             </div>
             {/* Line 2 */}
-            <div className="col-span-2">
+            <div className="md:col-span-2">
               <Label
                 className="text-xs font-bold uppercase tracking-wide mb-1.5 block"
                 style={{ color: BROWN, fontFamily: LATO }}
@@ -416,7 +416,7 @@ const AddressSection = ({
           <Button
             disabled={isPending}
             onClick={handleAddAddress}
-            className="w-full h-12 font-bold text-sm tracking-wide uppercase mt-1"
+            className="w-full h-8 md:h-12 font-bold text-xs md:text-sm tracking-wide uppercase mt-1"
             style={{
               background: `linear-gradient(135deg, ${BROWN} 0%, ${LIGHT_BROWN} 100%)`,
               color: "#fff",

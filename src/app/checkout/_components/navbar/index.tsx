@@ -8,13 +8,13 @@ const Navbar = ({step}: {step: CheckoutStep}) => {
   const index = steps.findIndex((s) => s === currStep) === -1 ? 0 : steps.findIndex((s) => s === currStep);
   return (
     <nav
-      className="sticky top-0 z-50 flex items-center justify-between px-8 h-16"
+      className="sticky top-0 z-50 flex items-center justify-between px-3 md:px-8 h-12 md:h-16"
       style={{ background: BROWN, boxShadow: `0 2px 16px rgba(85,19,5,0.35)` }}
     >
       <a
         href="#"
       >
-        <img className="w-auto h-10" src="/logo_main.png" alt="logo" />
+        <img className="w-auto h-8 md:h-10" src="/logo_main.png" alt="logo" />
       </a>
 
       {/* Checkout Steps Progress */}
@@ -50,7 +50,7 @@ const Navbar = ({step}: {step: CheckoutStep}) => {
       </div>
 
       <div
-        className="flex items-center gap-2 text-sm font-semibold"
+        className="flex items-center gap-2 text-xs md:text-sm font-semibold"
         style={{ color: "rgba(255,255,255,0.7)", fontFamily: LATO }}
       >
         <Lock size={14} style={{ color: LIGHT_ORANGE }} />

@@ -32,7 +32,7 @@ const SectionCard = ({
       }}
     >
       <div
-        className="w-full flex items-center justify-between px-6 py-4 text-left"
+        className="w-full flex items-center justify-between px-3 md:px-6 py-3 md:py-4 text-left"
         style={{
           background: completed ? "#f0faf4" : "#fff",
           cursor: collapsible ? "pointer" : "default",
@@ -94,7 +94,7 @@ const SectionCard = ({
         </div>
       </div>
       {(!collapsible || open) && !completed && (
-        <div className="px-6 pb-6">{children}</div>
+        <div className="px-3 md:px-6 pb-3 md:pb-6">{children}</div>
       )}
     </div>
   );
