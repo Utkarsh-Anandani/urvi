@@ -17,7 +17,7 @@ const pool = new Pool({
 attachDatabasePool(pool);
 
 // Create Prisma client (singleton)
-const prisma =
+const client =
   globalForPrisma.prisma ??
   new PrismaClient({
     //@ts-expect-error
@@ -26,7 +26,7 @@ const prisma =
 
 // Prevent multiple instances in dev
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+  globalForPrisma.prisma = client;
 }
 
-export default prisma;
+export default client;

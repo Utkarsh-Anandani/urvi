@@ -201,7 +201,7 @@ const AddressSection = ({
               cursor: addresses.length === 0 ? "not-allowed" : "pointer",
             }}
           >
-            Continue to Payment
+            Continue to Coupon
             <ChevronRight size={16} className="ml-2" />
           </Button>
         </div>

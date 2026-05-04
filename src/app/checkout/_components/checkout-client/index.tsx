@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, CreditCard, ArrowLeft, Package } from "lucide-react";
+import {
+  MapPin,
+  CreditCard,
+  ArrowLeft,
+  Package,
+  TicketPercent,
+} from "lucide-react";
 import { BROWN, CORMORANT, LATO, LIGHT_BROWN, ORANGE } from "@/lib/helper";
 import Navbar from "../navbar";
 import OrderConfirmed from "../order-confirmation";
@@ -13,6 +19,7 @@ import OrderReview from "../order-review";
 import OrderSummarySidebar from "../order-summary";
 import { useBuyNow } from "@/hooks/useBuyNow";
 import { ProductsData } from "@/app/(user)/my-cart/_components/cart-page-client";
+import CouponSection from "../coupon-section";
 
 export interface Address {
   id: string;
@@ -27,7 +34,13 @@ export interface Address {
   isDefault: boolean;
 }
 
-export type CheckoutStep = "address" | "payment" | "review";
+export type CheckoutStep = "address" | "coupon" | "payment" | "review";
+
+export type AppliedCoupon = {
+  couponId: string;
+  couponCode: string;
+  couponDiscount: number;
+} | null;
 
 function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
   const [step, setStep] = useState<CheckoutStep>("address");
@@ -35,6 +48,7 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
   const [paymentId, setPaymentId] = useState<string | undefined>();
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [confirmed, setConfirmed] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
 
   const { data } = useBuyNow(slug);
   const { data: productsData } = data as ProductsData;
@@ -43,7 +57,7 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
 
   const handleAddressComplete = (addr: Address) => {
     setAddress(addr);
-    setStep("payment");
+    setStep("coupon");
   };
 
   const handlePaymentComplete = (method: string, pid?: string) => {
@@ -53,6 +67,12 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
     // Auto-confirm after brief delay to show review
     setTimeout(() => setConfirmed(true), 800);
   };
+
+  const handleCouponComplete = () => {
+    setStep("payment");
+  };
+
+  const total = appliedCoupon ? productsData.netDiscountPriceTotal - appliedCoupon.couponDiscount : productsData.netDiscountPriceTotal;
 
   return (
     <div
@@ -92,8 +112,6 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
             </p>
           </div>
 
-          {/* <StepIndicator current={step} /> */}
-
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
             {/* ── LEFT: STEPS ── */}
             <div className="flex flex-col gap-4 animate-in">
@@ -112,6 +130,30 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
                 <AddressSection onComplete={handleAddressComplete} />
               </SectionCard>
 
+              {/* COUPON */}
+              {(step === "coupon" ||
+                step === "payment" ||
+                step === "review") && (
+                <SectionCard
+                  title="Coupons"
+                  icon={<TicketPercent size={16} />}
+                  completed={step === "payment"}
+                  summary={
+                    appliedCoupon
+                      ? `Coupon Applied: ${appliedCoupon.couponCode}`
+                      : "No coupon applied"
+                  }
+                  onEdit={() => setStep("coupon")}
+                >
+                  <CouponSection
+                    applied={appliedCoupon}
+                    onApply={setAppliedCoupon}
+                    slug={slug}
+                    handleSubmit={handleCouponComplete}
+                  />
+                </SectionCard>
+              )}
+
               {/* PAYMENT */}
               {(step === "payment" || step === "review") && (
                 <SectionCard
@@ -126,12 +168,13 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
                   onEdit={() => setStep("payment")}
                 >
                   <PaymentSection
-                    total={productsData.netDiscountPriceTotal}
+                    total={total}
                     selectedAddressId={address ? address.id : null}
                     customerName={address?.name || ""}
                     customerPhone={address?.phone || ""}
                     onComplete={handlePaymentComplete}
                     slug={slug}
+                    couponCode={appliedCoupon?.couponCode || undefined}
                   />
                 </SectionCard>
               )}
@@ -170,7 +213,7 @@ function CheckoutPageClient({ slug }: { slug: "cart" | "buy-now" }) {
             <div className="sticky top-20">
               <OrderSummarySidebar
                 productsData={productsData}
-                couponDiscount={0}
+                couponDiscount={appliedCoupon?.couponDiscount || 0}
                 deliveryPrice={0}
               />
             </div>

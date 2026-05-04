@@ -4,7 +4,6 @@ import { ShoppingCart, Trash2, Leaf, Check, ArrowLeft, X } from "lucide-react";
 import OrderSummary from "../order-summary";
 import SuggestedProducts from "../suggested-products";
 import DeliveryInfo from "../delivery-info";
-import CouponSection from "../coupon-section";
 import CartItemCard from "../cart-item-card";
 import EmptyCart from "../empty-cart";
 import {
@@ -94,10 +93,9 @@ export type ProductsData =
       data: null;
     };
 
-// ─── ROOT CART PAGE ──────────────────────────────────────────────
 const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
-  const [couponCode, setCouponCode] = useState<string | null>(null);
-  const [discountPct, setDiscountPct] = useState(0);
+  // const [couponCode, setCouponCode] = useState<string | null>(null);
+  // const [discountPct, setDiscountPct] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const router = useRouter();
 
@@ -141,10 +139,10 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
     removeFromCart(cartItem);
   };
 
-  const handleCoupon = (code: string, pct: number) => {
-    setCouponCode(code || null);
-    setDiscountPct(pct);
-  };
+  // const handleCoupon = (code: string, pct: number) => {
+  //   setCouponCode(code || null);
+  //   setDiscountPct(pct);
+  // };
 
   return (
     <>
@@ -236,13 +234,13 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
               </div>
 
               {/* Coupon */}
-              <CouponSection onApply={handleCoupon} applied={couponCode} />
+              {/* <CouponSection onApply={handleCoupon} applied={couponCode} /> */}
 
               {/* Order Summary */}
               <div className="block xl:hidden">
                 <OrderSummary
-                  couponCode={couponCode}
-                  discountPct={discountPct}
+                  couponCode={null}
+                  discountPct={0}
                   originalTotal={productsData?.netPriceTotal || 0}
                   discountTotal={productsData?.netDiscountPriceTotal || 0}
                   totalItems={productsData?.totalQuantity || 0}
@@ -259,8 +257,8 @@ const CartPageClient = ({ isloggedIn }: { isloggedIn: boolean }) => {
             {/* ── RIGHT COLUMN: ORDER SUMMARY ── */}
             <div className="sticky top-20 hidden xl:flex flex-col gap-4">
               <OrderSummary
-                couponCode={couponCode}
-                discountPct={discountPct}
+                couponCode={null}
+                discountPct={0}
                 originalTotal={productsData?.netPriceTotal || 0}
                 discountTotal={productsData?.netDiscountPriceTotal || 0}
                 totalItems={productsData?.totalQuantity || 0}

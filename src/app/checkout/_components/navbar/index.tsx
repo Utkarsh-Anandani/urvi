@@ -3,7 +3,7 @@ import { Check, ChevronRight, Lock } from "lucide-react";
 import { CheckoutStep } from "../checkout-client";
 
 const Navbar = ({step}: {step: CheckoutStep}) => {
-  const steps = ["Address", "Payment", "Review"];
+  const steps = ["Address", "Coupon", "Payment", "Review"];
   const currStep = step.charAt(0).toUpperCase() + step.slice(1);
   const index = steps.findIndex((s) => s === currStep) === -1 ? 0 : steps.findIndex((s) => s === currStep);
   return (

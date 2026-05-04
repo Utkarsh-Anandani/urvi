@@ -54,28 +54,31 @@ export default async function RootLayout({
     filters.map((f) =>
       client.prefetchQuery({
         queryKey: ["homepage-products", f],
-        queryFn: () => GetUserProducts({
-          filter: f as categoryFilterSlugType,
-          limit: 8
-        }),
+        queryFn: () =>
+          GetUserProducts({
+            filter: f as categoryFilterSlugType,
+            limit: 8,
+          }),
       }),
     ),
   );
 
-  await client.prefetchQuery({
-    queryKey: ["user-categories"],
-    queryFn: () => GetUserCategories(),
-  });
+  if (session && session.id) {
+    await client.prefetchQuery({
+      queryKey: ["user-categories"],
+      queryFn: () => GetUserCategories(),
+    });
 
-  await client.prefetchQuery({
-    queryKey: ["user-profile"],
-    queryFn: () => GetUserProfile(),
-  });
+    await client.prefetchQuery({
+      queryKey: ["user-profile"],
+      queryFn: () => GetUserProfile(),
+    });
 
-  await client.prefetchQuery({
-    queryKey: ["user-addresses"],
-    queryFn: () => GetAllAddresses(),
-  });
+    await client.prefetchQuery({
+      queryKey: ["user-addresses"],
+      queryFn: () => GetAllAddresses(),
+    });
+  }
 
   await client.prefetchQuery({
     queryKey: ["user-cart"],

@@ -7,13 +7,15 @@ import {
 } from "@tanstack/react-query";
 import { getBuyNowItem } from "@/lib/buy-now";
 import { GetCartItems, GetLocalCartItems } from "@/actions/cart";
+import { toast } from "sonner";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
 
 async function CheckoutPage({ params }: Props) {
-  await requireAuth();
+  const session = await requireAuth();
+  if(!session || !session.id) toast("Log In to proceed");
   const { slug } = await params;
 
   const client = new QueryClient();

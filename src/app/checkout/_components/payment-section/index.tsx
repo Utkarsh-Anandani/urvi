@@ -9,7 +9,7 @@ import {
 import { fmt } from "@/lib/helper";
 import { Button } from "@/components/ui/button";
 import { useRazorpay } from "@/hooks/useRazorpay";
-import { getBuyNowItem } from "@/lib/buy-now";
+import { getBuyNowItem, removeBuyNowItem } from "@/lib/buy-now";
 import { BROWN, LATO, LIGHT_BROWN, LIGHTER_ORANGE, ORANGE } from "@/lib/helper";
 import {
   Banknote,
@@ -31,6 +31,7 @@ const PaymentSection = ({
   onComplete,
   selectedAddressId,
   slug,
+  couponCode,
 }: {
   total: number;
   customerName: string;
@@ -38,6 +39,7 @@ const PaymentSection = ({
   onComplete: (method: string, paymentId?: string) => void;
   selectedAddressId: string | null;
   slug: "cart" | "buy-now";
+  couponCode: string | undefined;
 }) => {
   const [method, setMethod] = useState<PaymentMethod>("online");
   const [processing, setProcessing] = useState(false);
@@ -77,11 +79,13 @@ const PaymentSection = ({
           selectedAddressId,
           slug,
           item ? item : undefined,
+          couponCode,
         );
         if (res.status !== 201) toast("Error creating COD order");
 
         setProcessing(false);
         onComplete("cod", res.data?.orderId);
+        removeBuyNowItem();
         return;
       }
 
@@ -89,6 +93,7 @@ const PaymentSection = ({
         selectedAddressId,
         slug,
         item ? item : undefined,
+        couponCode,
       );
       if (res.status !== 201 || !res.data)
         throw new Error("Order creation failed");

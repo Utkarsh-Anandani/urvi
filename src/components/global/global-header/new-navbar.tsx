@@ -20,22 +20,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { SignOutAction } from "@/actions/auth";
 
 const userOptions = [
   {
     name: "My Profile",
     href: "/my-profile",
-    icon: <User size={20} strokeWidth={3} style={{ color: ORANGE }} />,
+    icon: <User size={20} strokeWidth={2} style={{ color: ORANGE }} />,
   },
   {
     name: "My Orders",
     href: "/orders",
-    icon: <Package size={20} strokeWidth={3} style={{ color: ORANGE }} />,
+    icon: <Package size={20} strokeWidth={2} style={{ color: ORANGE }} />,
   },
   {
     name: "Logout",
     href: "/signin",
-    icon: <LogOut size={20} strokeWidth={3} style={{ color: ORANGE }} />,
+    icon: <LogOut size={20} strokeWidth={2} style={{ color: ORANGE }} />,
   },
 ];
 
@@ -144,7 +145,12 @@ const Navbar = ({ isLoggedIn, name }: Props) => {
                   {userOptions.map((opt, i) => (
                     <DropdownMenuItem
                       key={i}
-                      onClick={() => router.push(opt.href)}
+                      onClick={async () => {
+                        if(opt.name === "Logout") {
+                          await SignOutAction();
+                        }
+                        router.push(opt.href)
+                      }}
                       className="flex items-center gap-3 cursor-pointer"
                     >
                       {opt.icon}

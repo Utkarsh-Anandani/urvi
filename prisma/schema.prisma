@@ -26,23 +26,24 @@ enum Gender {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  salt      String
-  firstName String
-  lastName  String?
-  phone     String?
-  dob       String?
-  gender    Gender?
-  image     String?
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  reviews   Review[]
-  cart      Cart?
-  addresses Address[]
-  orders    Order[]
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  salt         String
+  firstName    String
+  lastName     String?
+  phone        String?
+  dob          String?
+  gender       Gender?
+  image        String?
+  role         Role          @default(USER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  reviews      Review[]
+  cart         Cart?
+  addresses    Address[]
+  orders       Order[]
+  couponUsages CouponUsage[]
 }
 
 model Address {
@@ -96,6 +97,7 @@ model Product {
   cartItems           CartItem[]
   orderItems          OrderItem[]
   productPageSections ProductPageSection[]
+  couponProducts      CouponProduct[]
 
   @@index([categoryId])
   @@index([isActive])
@@ -109,8 +111,9 @@ model Category {
   image    CategoryImage?
   products Product[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  couponCategories CouponCategory[]
 }
 
 model CategoryImage {
@@ -320,6 +323,11 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  coupon         Coupon? @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  couponId       String?
+  couponCode     String?
+  couponDiscount Float?
+
   @@index([userId])
   @@index([status])
 }
@@ -343,4 +351,78 @@ model OrderItem {
   price Float
 
   createdAt DateTime @default(now())
+}
+
+enum CouponScope {
+  GLOBAL
+  CATEGORY
+  PRODUCT
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FLAT
+}
+
+model Coupon {
+  id   String @id @default(uuid())
+  code String @unique
+
+  discountType  DiscountType
+  discountValue Float
+
+  minOrderAmount Float?
+  maxDiscount    Float?
+
+  usageLimit Int?
+  usedCount  Int  @default(0)
+
+  isActive Boolean @default(true)
+
+  scope CouponScope @default(GLOBAL)
+
+  products   CouponProduct[]
+  categories CouponCategory[]
+
+  maxUsagePerUser Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+  usages CouponUsage[]
+}
+
+model CouponProduct {
+  couponId  String
+  productId String
+
+  coupon  Coupon  @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, productId])
+}
+
+model CouponCategory {
+  couponId   String
+  categoryId String
+
+  coupon   Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, categoryId])
+}
+
+model CouponUsage {
+  id String @id @default(uuid())
+
+  userId   String
+  couponId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  usedAt DateTime @default(now())
+
+  @@unique([userId, couponId])
 }
